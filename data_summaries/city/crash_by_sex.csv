@@ -1,0 +1,70 @@
+MUNINAME,year,ped_type,ped_inj,ped_sex,count
+MILWAUKEE,2017,BIKE,Fatality,M,1
+MILWAUKEE,2017,BIKE,Fatality,UNKN,1
+MILWAUKEE,2017,BIKE,Suspected Serious Injury,F,3
+MILWAUKEE,2017,BIKE,Suspected Serious Injury,M,5
+MILWAUKEE,2017,BIKE,Suspected Serious Injury,UNKN,1
+MILWAUKEE,2017,PED,Fatality,F,4
+MILWAUKEE,2017,PED,Fatality,M,9
+MILWAUKEE,2017,PED,Fatality,UNKN,3
+MILWAUKEE,2017,PED,Suspected Serious Injury,F,12
+MILWAUKEE,2017,PED,Suspected Serious Injury,M,19
+MILWAUKEE,2017,PED,Suspected Serious Injury,UNKN,28
+MILWAUKEE,2018,BIKE,Suspected Serious Injury,F,1
+MILWAUKEE,2018,BIKE,Suspected Serious Injury,M,4
+MILWAUKEE,2018,BIKE,Suspected Serious Injury,UNKN,3
+MILWAUKEE,2018,PED,Fatality,F,3
+MILWAUKEE,2018,PED,Fatality,M,8
+MILWAUKEE,2018,PED,Fatality,UNKN,6
+MILWAUKEE,2018,PED,Suspected Serious Injury,F,10
+MILWAUKEE,2018,PED,Suspected Serious Injury,M,31
+MILWAUKEE,2018,PED,Suspected Serious Injury,UNKN,22
+MILWAUKEE,2019,BIKE,Suspected Serious Injury,F,2
+MILWAUKEE,2019,BIKE,Suspected Serious Injury,M,6
+MILWAUKEE,2019,BIKE,Suspected Serious Injury,UNKN,3
+MILWAUKEE,2019,PED,Fatality,F,3
+MILWAUKEE,2019,PED,Fatality,M,6
+MILWAUKEE,2019,PED,Fatality,UNKN,1
+MILWAUKEE,2019,PED,Suspected Serious Injury,F,23
+MILWAUKEE,2019,PED,Suspected Serious Injury,M,30
+MILWAUKEE,2019,PED,Suspected Serious Injury,UNKN,18
+MILWAUKEE,2020,BIKE,Fatality,F,1
+MILWAUKEE,2020,BIKE,Fatality,M,2
+MILWAUKEE,2020,BIKE,Suspected Serious Injury,F,1
+MILWAUKEE,2020,BIKE,Suspected Serious Injury,M,3
+MILWAUKEE,2020,BIKE,Suspected Serious Injury,UNKN,1
+MILWAUKEE,2020,PED,Fatality,F,3
+MILWAUKEE,2020,PED,Fatality,M,9
+MILWAUKEE,2020,PED,Suspected Serious Injury,F,6
+MILWAUKEE,2020,PED,Suspected Serious Injury,M,24
+MILWAUKEE,2020,PED,Suspected Serious Injury,UNKN,28
+MILWAUKEE,2021,BIKE,Fatality,M,1
+MILWAUKEE,2021,BIKE,Suspected Serious Injury,M,5
+MILWAUKEE,2021,BIKE,Suspected Serious Injury,UNKN,5
+MILWAUKEE,2021,PED,Fatality,F,6
+MILWAUKEE,2021,PED,Fatality,M,5
+MILWAUKEE,2021,PED,Fatality,UNKN,6
+MILWAUKEE,2021,PED,Suspected Serious Injury,F,12
+MILWAUKEE,2021,PED,Suspected Serious Injury,M,28
+MILWAUKEE,2021,PED,Suspected Serious Injury,UNKN,30
+MILWAUKEE,2022,BIKE,Fatality,F,1
+MILWAUKEE,2022,BIKE,Fatality,M,3
+MILWAUKEE,2022,BIKE,Fatality,UNKN,1
+MILWAUKEE,2022,BIKE,Suspected Serious Injury,F,1
+MILWAUKEE,2022,BIKE,Suspected Serious Injury,M,6
+MILWAUKEE,2022,BIKE,Suspected Serious Injury,UNKN,2
+MILWAUKEE,2022,PED,Fatality,F,2
+MILWAUKEE,2022,PED,Fatality,M,12
+MILWAUKEE,2022,PED,Fatality,UNKN,9
+MILWAUKEE,2022,PED,Suspected Serious Injury,F,13
+MILWAUKEE,2022,PED,Suspected Serious Injury,M,20
+MILWAUKEE,2022,PED,Suspected Serious Injury,UNKN,20
+MILWAUKEE,2023,BIKE,Fatality,M,1
+MILWAUKEE,2023,BIKE,Suspected Serious Injury,M,5
+MILWAUKEE,2023,BIKE,Suspected Serious Injury,UNKN,2
+MILWAUKEE,2023,PED,Fatality,F,1
+MILWAUKEE,2023,PED,Fatality,M,12
+MILWAUKEE,2023,PED,Fatality,UNKN,6
+MILWAUKEE,2023,PED,Suspected Serious Injury,F,18
+MILWAUKEE,2023,PED,Suspected Serious Injury,M,16
+MILWAUKEE,2023,PED,Suspected Serious Injury,UNKN,33
