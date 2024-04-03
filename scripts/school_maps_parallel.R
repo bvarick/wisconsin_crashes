@@ -252,7 +252,7 @@ district_focus <- district_focus[! district_focus %in% districts_done$district]
 generate_school_maps <- function(district) {
   
   message(paste("***", district, "School District |", match(district, district_focus), "/271"))
-  options(ggmap.file_drawer = paste0("data/basemaps/districts/", district))
+  options(ggmap.file_drawer = paste0("basemaps/districts/", district))
   dir.create(file_drawer(), recursive = TRUE, showWarnings = FALSE)
   saveRDS(list(), file_drawer("index.rds"))
   readRDS(file_drawer("index.rds"))
@@ -293,7 +293,7 @@ generate_school_maps <- function(district) {
               top = as.double(bbox[4]))
     
     #get basemap
-    basemap <- get_stadiamap(bbox = bbox, zoom = 16, maptype = "stamen_toner_lite")
+    basemap <- get_stadiamap(bbox = bbox, zoom = 15, maptype = "stamen_toner_lite")
     
     # generate map
     ggmap(basemap) +
@@ -305,11 +305,12 @@ generate_school_maps <- function(district) {
                              min(year(TOPS_data$date), na.rm = TRUE), 
                              " - ", 
                              max(year(TOPS_data$date), na.rm = TRUE)),
-           caption = "data from Wisconsin DOT, UW TOPS Laboratory, Wisconsin DPI, and OpenStreetMap",
+           caption = "crash data from UW TOPS lab - retrieved 3/2024 per direction of the WisDOT Bureau of Transportation Safety\nbasemap from StadiaMaps and OpenStreetMap Contributers",
            x = NULL,
            y = NULL) +
       theme(axis.text=element_blank(),
-            axis.ticks=element_blank()) +
+            axis.ticks=element_blank(),
+            plot.caption = element_text(color = "grey")) +
       
       ## add bike lts
       #geom_sf(data = bike_lts[[county]],
@@ -389,7 +390,7 @@ generate_school_maps <- function(district) {
 ## generate maps in parallel ----
 mclapply(district_focus,
          generate_school_maps,
-         mc.cores = 4,
+         mc.cores = 8,
          mc.cleanup = TRUE,
          mc.preschedule = TRUE,
          mc.silent = FALSE)

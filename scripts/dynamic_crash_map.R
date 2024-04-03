@@ -157,7 +157,7 @@ tag.map.subtitle <- tags$style(HTML("
 
 subtitle <- tags$div(
   tag.map.subtitle, HTML("data from UW TOPS lab - retrieved 4/2024</br>per direction of the WisDOT Bureau of Transportation Safety")
-)  
+)
 
 leaflet() %>%
   addControl(title, position = "topleft", className="map-title") %>%

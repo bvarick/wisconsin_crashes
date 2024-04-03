@@ -95,11 +95,11 @@ bike_lts_scale <- data.frame(code = c(1, 2, 3, 4, 9),
 
 # register stadia API key ----
 register_stadiamaps(key = substr(read_file(file = "api_keys/stadia_api_key"), 1, 36))
-options(ggmap.file_drawer = "basemaps")
+#options(ggmap.file_drawer = "basemaps")
 # dir.create(file_drawer(), recursive = TRUE, showWarnings = FALSE)
 # saveRDS(list(), file_drawer("index.rds"))
-readRDS(file_drawer("index.rds"))
-file_drawer("index.rds")
+#readRDS(file_drawer("index.rds"))
+#file_drawer("index.rds")
 
 # load census api key ----
 #census_api_key(key = substr(read_file(file = "api_keys/census_api_key"), 1, 40))
@@ -111,16 +111,16 @@ school_symbol <- image_read_svg(path = "other/school_FILL0_wght400_GRAD0_opsz24.
 ## ---- generate charts/maps ----
 ## set parameters of run
 
-county_focus <- str_to_upper(unique(WI_schools %>% pull(CTY_DIST)))
+#county_focus <- str_to_upper(unique(WI_schools %>% pull(CTY_DIST)))
 #county_focus <- c("DANE")
-#county_focus <- c("MILWAUKEE")
+county_focus <- c("MILWAUKEE")
 
-school_type_focus <- unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus)) %>% pull(SCHOOLTYPE))
-#school_type_focus <- c("High School")
+#school_type_focus <- unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus)) %>% pull(SCHOOLTYPE))
+school_type_focus <- c("High School")
 
-district_focus <- unique(WI_schools %>%   filter(CTY_DIST %in% str_to_title(county_focus),  SCHOOLTYPE %in% school_type_focus, !is.na(DISTRICT_NAME)) %>%  pull(DISTRICT_NAME))
+#district_focus <- unique(WI_schools %>%   filter(CTY_DIST %in% str_to_title(county_focus),  SCHOOLTYPE %in% school_type_focus, !is.na(DISTRICT_NAME)) %>%  pull(DISTRICT_NAME))
 #district_focus <- c("Madison Metropolitan")
-#district_focus <- c("Milwaukee")
+district_focus <- c("Milwaukee")
 
 school_number <- length(unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus),  
                                               SCHOOLTYPE %in% school_type_focus, 
@@ -238,6 +238,11 @@ i <- 0
 for(district in district_focus) {
   
   message(paste("***", district, "School District |"))
+  options(ggmap.file_drawer = paste0("basemaps/districts/", district))
+  dir.create(file_drawer(), recursive = TRUE, showWarnings = FALSE)
+  saveRDS(list(), file_drawer("index.rds"))
+  readRDS(file_drawer("index.rds"))
+  file_drawer("index.rds")
   for(school in WI_schools %>%
       filter(DISTRICT_NAME %in% district,
              SCHOOLTYPE %in% school_type_focus,
@@ -275,7 +280,7 @@ for(district in district_focus) {
               top = as.double(bbox[4]))
     
     #get basemap
-    basemap <- get_stadiamap(bbox = bbox, zoom = 16, maptype = "stamen_toner_lite")
+    basemap <- get_stadiamap(bbox = bbox, zoom = 15, maptype = "stamen_toner_lite")
     
     # generate map
     ggmap(basemap) +
@@ -287,11 +292,12 @@ for(district in district_focus) {
                              min(year(TOPS_data$date), na.rm = TRUE), 
                              " - ", 
                              max(year(TOPS_data$date), na.rm = TRUE)),
-           caption = "data from Wisconsin DOT, UW TOPS Laboratory, Wisconsin DPI, and OpenStreetMap",
+           caption = "crash data from UW TOPS lab - retrieved 3/2024 per direction of the WisDOT Bureau of Transportation Safety\nbasemap from StadiaMaps and OpenStreetMap Contributers",
            x = NULL,
            y = NULL) +
       theme(axis.text=element_blank(),
-            axis.ticks=element_blank()) +
+            axis.ticks=element_blank(),
+            plot.caption = element_text(color = "grey")) +
       
       ## add bike lts
       #geom_sf(data = bike_lts[[county]],
