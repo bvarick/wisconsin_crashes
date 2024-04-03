@@ -128,3 +128,4 @@ ggsave(file = paste0("figures/crash_summaries/counties_year.pdf"),
        height = 8.5,
        width = 11,
        units = "in")
+e
