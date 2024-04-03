@@ -119,10 +119,12 @@ county_focus <- str_to_upper(unique(WI_schools %>% pull(CTY_DIST)))
 #county_focus <- c("VILAS", "BROWN")
 #county_focus <- c("BROWN")
 
-school_type_focus <- unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus)) %>% pull(SCHOOLTYPE))
+school_type_focus <- unique(WI_schools %>% pull(SCHOOLTYPE))
+#school_type_focus <- unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus)) %>% pull(SCHOOLTYPE))
 #school_type_focus <- c("High School")
 
-district_focus <- unique(WI_schools %>%   filter(CTY_DIST %in% str_to_title(county_focus),  SCHOOLTYPE %in% school_type_focus, !is.na(DISTRICT_NAME)) %>%  pull(DISTRICT_NAME))
+district_focus <- unique(WI_schools %>% pull(DISTRICT_NAME))
+#district_focus <- unique(WI_schools %>%   filter(CTY_DIST %in% str_to_title(county_focus),  SCHOOLTYPE %in% school_type_focus, !is.na(DISTRICT_NAME)) %>%  pull(DISTRICT_NAME))
 #district_focus <- c("Madison Metropolitan")
 #district_focus <- c("Milwaukee")
 #district_focus <- c("Charter")
@@ -157,10 +159,10 @@ for(county in county_focus) {
     labs(title = paste0("Pedestrians/bicyclists under 18 years old hit by cars in ",
                         str_to_title(county), 
                         " County"),
+         caption = "crash data from UW TOPS lab - retrieved 3/2024 per direction of the WisDOT Bureau of Transportation Safety",
          x = "Year",
-         y = "Number of crashes",
-         caption = "data from UW TOPS Laboratory")
-  ggsave(file = paste0("figures/crash_maps/Crash Maps/", 
+         y = "Number of crashes")
+  ggsave(file = paste0("~/temp/figures/crash_maps/Crash Maps/", 
                        str_to_title(county), 
                        " County/_",
                        str_to_title(county), 
@@ -251,7 +253,7 @@ districts_done <- read_csv(file = "other/districts_done.csv")
 district_focus <- district_focus[! district_focus %in% districts_done$district]
 generate_school_maps <- function(district) {
   
-  message(paste("***", district, "School District |", match(district, district_focus), "/271"))
+  message(paste("***", district, "School District |", match(district, district_focus), "/", length(district_focus)))
   options(ggmap.file_drawer = paste0("basemaps/districts/", district))
   dir.create(file_drawer(), recursive = TRUE, showWarnings = FALSE)
   saveRDS(list(), file_drawer("index.rds"))
@@ -367,7 +369,7 @@ generate_school_maps <- function(district) {
                         xmax = bbox['right'] + (bbox['right']-bbox['left']) * 0.20) +
       coord_sf(clip = "off")
     
-    ggsave(file = paste0("figures/crash_maps/Crash Maps/",
+    ggsave(file = paste0("~/temp/figures/crash_maps/Crash Maps/",
                          str_to_title(school_data %>% pull(CTY_DIST)), 
                          " County/",
                          school_data %>% pull(DISTRICT_NAME), 
@@ -390,7 +392,7 @@ generate_school_maps <- function(district) {
 ## generate maps in parallel ----
 mclapply(district_focus,
          generate_school_maps,
-         mc.cores = 8,
+         mc.cores = 12,
          mc.cleanup = TRUE,
          mc.preschedule = TRUE,
          mc.silent = FALSE)
@@ -400,7 +402,7 @@ double_check <- list(NULL)
 for(school in WI_schools$district_school) {
   school_data <- WI_schools %>% filter(district_school %in% school)
    school_check <- data.frame(district_school = c(school),
-                              exists = c(file.exists(paste0("figures/crash_maps/Crash Maps/",
+                              exists = c(file.exists(paste0("~/temp/figures/crash_maps/Crash Maps/",
                                                str_to_title(school_data %>% pull(CTY_DIST)), 
                                                " County/",
                                                school_data %>% pull(DISTRICT_NAME), 

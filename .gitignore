@@ -5,3 +5,4 @@ api_keys/*
 basemaps/*
 .Rproj.user
 .Rhistory
+other/districts_done.csv
