@@ -1,6 +1,6 @@
 library(tidyverse)
 library(sf)
-library(tmap)
+#library(tmap)
 library(leaflet)
 library(RColorBrewer)
 library(tidycensus)
@@ -81,17 +81,17 @@ focus_columns <- c("PedestrianInjurySeverity", "CrashDate", "CrashTime", "County
 focus_county <- "DANE"
 
 ## generate map with tmap ----
-tmap_mode("view")
-
-Pedestrian_Crash_Data <- TOPS_geom %>% 
-#  filter(CNTYNAME == focus_county) %>%
-  select(all_of(focus_columns))
-
-tm_basemap("Stadia.AlidadeSmooth") +
-  tm_shape(Pedestrian_Crash_Data) +
-  tm_dots("PedestrianInjurySeverity", palette = injury_severity$color, popup.vars	= focus_columns)
-  
-tmap_save(file = "figures/dynamic_crash_maps/dynamic_crash_map.html")
+# tmap_mode("view")
+# 
+# Pedestrian_Crash_Data <- TOPS_geom %>% 
+# #  filter(CNTYNAME == focus_county) %>%
+#   select(all_of(focus_columns))
+# 
+# tm_basemap("Stadia.AlidadeSmooth") +
+#   tm_shape(Pedestrian_Crash_Data) +
+#   tm_dots("PedestrianInjurySeverity", palette = injury_severity$color, popup.vars	= focus_columns)
+#   
+# tmap_save(file = "figures/dynamic_crash_maps/dynamic_crash_map.html")
 
 
 # generate map with leaflet ----
@@ -138,7 +138,7 @@ tag.map.title <- tags$style(HTML("
 "))
 
 title <- tags$div(
-  tag.map.title, HTML("Pedestrian Crashes</br>2017-2023")
+  tag.map.title, HTML("Pedestrians & Bicyclists hit by cars</br>2017-2023")
 )  
 
 tag.map.subtitle <- tags$style(HTML("
@@ -156,7 +156,7 @@ tag.map.subtitle <- tags$style(HTML("
 "))
 
 subtitle <- tags$div(
-  tag.map.subtitle, HTML("data from UW TOPS lab - retrieved 4/2024</br>per direction of the WisDOT Bureau of Transportation Safety")
+  tag.map.subtitle, HTML("data from UW TOPS lab - retrieved 3/2024</br>per direction of the WisDOT Bureau of Transportation Safety")
 )
 
 leaflet() %>%
@@ -192,4 +192,7 @@ leaflet() %>%
   addLegend(position = "bottomleft", pal = county_pal, values = County_Crash_Data$CrashesPerPopulation, group = "Counties", title = "Mean Crashes/Year in County</br>(per 100,000 residents)") %>%
 #  addLegendSize(position = "bottomright", color = "black", shape = "circle", values = County_Crash_Data$value.y, group = "Counties", title = "Population of County") %>%
   groupOptions(group ="Counties", zoomLevels = 1:9)
+
+
+
 
