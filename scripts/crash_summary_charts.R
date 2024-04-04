@@ -13,6 +13,7 @@ for (file in list.files(path = "data/TOPS/", pattern = "crash-data-download")) {
   message(paste("importing data from file: ", file))
   year <- substr(file, 21, 24)
   csv_run <- read_csv(file = paste0("data/TOPS/",file), col_types = cols(.default = "c"))
+  csv_run["retreive_date"] <- file.info(file = paste0("data/TOPS/",file))$mtime
   TOPS_data[[file]] <- csv_run
 }
 rm(csv_run, file, year)
@@ -27,6 +28,8 @@ TOPS_data <- TOPS_data %>%
          longitude = as.double(LONDECDG)) %>% 
   mutate(month = month(date, label = TRUE),
          year = as.factor(year(date)))
+
+retrieve_date <- max(TOPS_data %>% filter(year %in% max(year(TOPS_data$date), na.rm = TRUE)) %>% pull(retreive_date))
 
 # Injury Severy Index and Color -----
 injury_severity <- data.frame(InjSevName = c("No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
@@ -121,7 +124,10 @@ TOPS_data %>%
        x = "Year",
        y = "Total crashes per year per 100,000 residents",
        color = "County",
-       caption = "data from UW TOPS lab\nretrieved 3/2024 per direction of the WisDOT Bureau of Transportation Safety") +
+       caption = paste0("crash data from UW TOPS lab - retrieved ",
+                        strftime(retrieve_date, format = "%m/%Y"),
+                        " per direction of the WisDOT Bureau of Transportation Safety",
+                        "\nbasemap from StadiaMaps and OpenStreetMap Contributers")) +
   theme(plot.caption = element_text(color = "grey"))
 
 ggsave(file = paste0("figures/crash_summaries/counties_year.pdf"),

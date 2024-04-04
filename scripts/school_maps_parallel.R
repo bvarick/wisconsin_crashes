@@ -20,13 +20,14 @@ library(parallel)
 ## Load TOPS data ----
 ## load TOPS data for the whole state (crashes involving bikes and pedestrians),
 TOPS_data <- as.list(NULL)
-for (file in list.files(path = "data/TOPS", pattern = "crash-data-download")) {
+for (file in list.files(path = "data/TOPS/", pattern = "crash-data-download")) {
   message(paste("importing data from file: ", file))
   year <- substr(file, 21, 24)
   csv_run <- read_csv(file = paste0("data/TOPS/",file), col_types = cols(.default = "c"))
+  csv_run["retreive_date"] <- file.info(file = paste0("data/TOPS/",file))$mtime
   TOPS_data[[file]] <- csv_run
 }
-rm(csv_run)
+rm(csv_run, file, year)
 TOPS_data <- bind_rows(TOPS_data)
 
 ## clean up data
@@ -38,6 +39,8 @@ TOPS_data <- TOPS_data %>%
          longitude = as.double(LONDECDG)) %>% 
   mutate(month = month(date, label = TRUE),
          year = as.factor(year(date)))
+
+retrieve_date <- max(TOPS_data %>% filter(year %in% max(year(TOPS_data$date), na.rm = TRUE)) %>% pull(retreive_date))
 
 # county index
 counties <- data.frame(name = c("Dane", "Milwaukee"),
@@ -159,7 +162,10 @@ for(county in county_focus) {
     labs(title = paste0("Pedestrians/bicyclists under 18 years old hit by cars in ",
                         str_to_title(county), 
                         " County"),
-         caption = "crash data from UW TOPS lab - retrieved 3/2024 per direction of the WisDOT Bureau of Transportation Safety",
+         caption = paste0("crash data from UW TOPS lab - retrieved ",
+                          strftime(retrieve_date, format = "%m/%Y"),
+                          " per direction of the WisDOT Bureau of Transportation Safety",
+                          "\nbasemap from StadiaMaps and OpenStreetMap Contributers"),
          x = "Year",
          y = "Number of crashes")
   ggsave(file = paste0("~/temp/figures/crash_maps/Crash Maps/", 
@@ -307,7 +313,10 @@ generate_school_maps <- function(district) {
                              min(year(TOPS_data$date), na.rm = TRUE), 
                              " - ", 
                              max(year(TOPS_data$date), na.rm = TRUE)),
-           caption = "crash data from UW TOPS lab - retrieved 3/2024 per direction of the WisDOT Bureau of Transportation Safety\nbasemap from StadiaMaps and OpenStreetMap Contributers",
+           caption = paste0("crash data from UW TOPS lab - retrieved ",
+                            strftime(retrieve_date, format = "%m/%Y"),
+                            " per direction of the WisDOT Bureau of Transportation Safety",
+                            "\nbasemap from StadiaMaps and OpenStreetMap Contributers"),
            x = NULL,
            y = NULL) +
       theme(axis.text=element_blank(),

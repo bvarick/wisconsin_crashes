@@ -16,11 +16,11 @@ for (file in list.files(path = "data/TOPS/", pattern = "crash-data-download")) {
   message(paste("importing data from file: ", file))
   year <- substr(file, 21, 24)
   csv_run <- read_csv(file = paste0("data/TOPS/",file), col_types = cols(.default = "c"))
+  csv_run["retreive_date"] <- file.info(file = paste0("data/TOPS/",file))$mtime
   TOPS_data[[file]] <- csv_run
 }
 rm(csv_run, file, year)
 TOPS_data <- bind_rows(TOPS_data)
-
 ## clean up data ----
 TOPS_data <- TOPS_data %>% 
   mutate(date = mdy(CRSHDATE), 
@@ -30,6 +30,9 @@ TOPS_data <- TOPS_data %>%
          longitude = as.double(LONDECDG)) %>% 
   mutate(month = month(date, label = TRUE),
          year = as.factor(year(date)))
+
+retrieve_date <- max(TOPS_data %>% filter(year %in% max(year(TOPS_data$date), na.rm = TRUE)) %>% pull(retreive_date))
+  
 
 # Injury Severy Index and Color -----
 injury_severity <- data.frame(InjSevName = c("No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
@@ -138,7 +141,10 @@ tag.map.title <- tags$style(HTML("
 "))
 
 title <- tags$div(
-  tag.map.title, HTML("Pedestrians & Bicyclists hit by cars</br>2017-2023")
+  tag.map.title, HTML(paste0("Pedestrians & Bicyclists involved in a crash</br>",
+                             min(year(TOPS_data$date), na.rm = TRUE),
+                             " - ",
+                             max(year(TOPS_data$date), na.rm = TRUE)))
 )  
 
 tag.map.subtitle <- tags$style(HTML("
@@ -156,13 +162,15 @@ tag.map.subtitle <- tags$style(HTML("
 "))
 
 subtitle <- tags$div(
-  tag.map.subtitle, HTML("data from UW TOPS lab - retrieved 3/2024</br>per direction of the WisDOT Bureau of Transportation Safety")
+  tag.map.subtitle, HTML(paste0("data from UW TOPS lab - retrieved ",
+                                strftime(retrieve_date, format = "%m/%Y"),
+                                "</br>per direction of the WisDOT Bureau of Transportation Safety"))
 )
 
 leaflet() %>%
-  addControl(title, position = "topleft", className="map-title") %>%
-  addControl(subtitle, position = "bottomleft", className="map-subtitle") %>%
-    addProviderTiles(providers$Stadia.AlidadeSmooth) %>%
+#  addControl(title, position = "topleft", className="map-title") %>%
+#  addControl(subtitle, position = "bottomleft", className="map-subtitle") %>%
+  addProviderTiles(providers$Stadia.AlidadeSmooth) %>%
   addCircleMarkers(data = Pedestrian_Crash_Data,
                    lng=Pedestrian_Crash_Data$longitude,
                    lat=Pedestrian_Crash_Data$latitude,
@@ -172,6 +180,9 @@ leaflet() %>%
                    color = "black",
                    weight = 1,
                    fillOpacity = 0.8,
+                   label = lapply(paste0("<b>", Pedestrian_Crash_Data$CrashDate, "</b></br>",
+                                  Pedestrian_Crash_Data$PedestrianInjurySeverity, "</br>",
+                                  "pedestrian age: ", Pedestrian_Crash_Data$PedestrianAge), htmltools::HTML),
                    group = "Crash Points") %>%
   addLegend(position = "bottomleft", labels = injury_severity$InjSevName, colors = injury_severity$color, group = "Crash Points", title = "Injury Severity") %>%
   groupOptions(group = "Crash Points", zoomLevels = 10:20) %>%
@@ -188,6 +199,9 @@ leaflet() %>%
                    color = "black",
                    weight = 1,
                    fillOpacity = 0.7,
+                   label = lapply(paste0("<b>", str_to_title(County_Crash_Data$County), " County</b></br>",
+                                  "mean pedestrian crashes/year: ", round(County_Crash_Data$MeanCrashes,0), "</br>",
+                                  "crashes/100,000 residents: ", round(County_Crash_Data$CrashesPerPopulation,0)), htmltools::HTML),
                    group = "Counties") %>%
   addLegend(position = "bottomleft", pal = county_pal, values = County_Crash_Data$CrashesPerPopulation, group = "Counties", title = "Mean Crashes/Year in County</br>(per 100,000 residents)") %>%
 #  addLegendSize(position = "bottomright", color = "black", shape = "circle", values = County_Crash_Data$value.y, group = "Counties", title = "Population of County") %>%
