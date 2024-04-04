@@ -5,6 +5,9 @@ library(leaflet)
 library(RColorBrewer)
 library(tidycensus)
 library(htmltools)
+library(magick)
+library(htmlwidgets)
+
 
 ## Load TOPS data ----
 ## To load TOPS data for the whole state for crashes involving bikes and pedestrians):
@@ -76,6 +79,15 @@ TOPS_data <- TOPS_data %>%
 
 
 TOPS_geom <- st_as_sf(TOPS_data %>% filter(!is.na(latitude)), coords = c("longitude", "latitude"), crs = 4326)
+
+## load school locations ----
+WI_schools <- st_read(dsn = "data/Schools/WI_schools.gpkg")
+WI_schools <- WI_schools %>% 
+  filter(is.double(LAT),
+         LAT > 0) %>%
+  select("SCHOOL", "DISTRICT", "SCHOOLTYPE", "LAT", "LON")
+
+school_symbol <- image_read_svg(path = "other/school_FILL0_wght400_GRAD0_opsz24.svg")
 
 ## add county borders ----
 CountyBoundaries <- read_sf("data/WI_County_Boundaries_24K.geojson")
@@ -167,10 +179,18 @@ subtitle <- tags$div(
                                 "</br>per direction of the WisDOT Bureau of Transportation Safety"))
 )
 
-leaflet() %>%
+wisconsin_crash_map <- leaflet(options = leafletOptions(preferCanvas = TRUE)) %>%
 #  addControl(title, position = "topleft", className="map-title") %>%
 #  addControl(subtitle, position = "bottomleft", className="map-subtitle") %>%
   addProviderTiles(providers$Stadia.AlidadeSmooth) %>%
+  addMarkers(data = WI_schools,
+             lng=WI_schools$LON,
+             lat = WI_schools$LAT,
+             label = lapply(paste0("<b>", WI_schools$SCHOOL, " School</b></br>",
+                                   WI_schools$DISTRICT, " School District</br>",
+                                   WI_schools$SCHOOLTYPE), htmltools::HTML),
+             group = "Schools") %>%
+  groupOptions(group = "Schools", zoomLevels = 13:20) %>%
   addCircleMarkers(data = Pedestrian_Crash_Data,
                    lng=Pedestrian_Crash_Data$longitude,
                    lat=Pedestrian_Crash_Data$latitude,
@@ -207,6 +227,6 @@ leaflet() %>%
 #  addLegendSize(position = "bottomright", color = "black", shape = "circle", values = County_Crash_Data$value.y, group = "Counties", title = "Population of County") %>%
   groupOptions(group ="Counties", zoomLevels = 1:9)
 
-
+saveWidget(wisconsin_crash_map, file = "figures/dynamic_crash_maps/wisconsin_crash_map.html")
 
 
