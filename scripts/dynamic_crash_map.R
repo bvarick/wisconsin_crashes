@@ -134,7 +134,7 @@ county_populations <- get_estimates(geography = "county", year = 2022, product =
 county_populations <- st_transform(county_populations, crs = 4326)
 County_Crash_geom <- left_join(county_populations, County_Crash_Data, join_by("County"))
 County_Crash_geom <- County_Crash_geom %>%
-  mutate(CrashesPerPopulation = MeanCrashes/value*100000)
+  mutate(CrashesPerPopulation = MeanCrashes/(value/100000))
 County_Crash_geom$CrashesPerPopulation[is.na(County_Crash_geom$CrashesPerPopulation)] <- 0
 
 county_pal <- colorNumeric(palette = "YlOrRd", domain = c(min(County_Crash_geom$CrashesPerPopulation, na.rm = TRUE), max(County_Crash_geom$CrashesPerPopulation, na.rm = TRUE)))
@@ -217,7 +217,7 @@ wisconsin_crash_map <-
               fillColor=county_pal(County_Crash_geom$CrashesPerPopulation),
               fillOpacity = 0.6,
               label = lapply(paste0("<b>", str_to_title(County_Crash_geom$County), " County</b></br>",
-                                    "population: ", County_Crash_geom$value, "<br>",
+                                    "population: ", format(County_Crash_geom$value, nsmall=0, big.mark=","), "<br>",
                                     "average crashes per year: ", round(County_Crash_geom$MeanCrashes,0), "</br>",
                                     "average crashes/year per 100k residents: ", round(County_Crash_geom$CrashesPerPopulation,0)), htmltools::HTML),
               group = "Counties") %>%
