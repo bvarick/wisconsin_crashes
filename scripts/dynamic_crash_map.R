@@ -42,6 +42,8 @@ injury_severity <- data.frame(InjSevName = c("No apparent injury", "Possible Inj
                               code = c("O", "C", "B", "A", "K"),
                               color = c("#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
 
+injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = injury_severity$InjSevName)
+
 TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR1 == code)) %>% 
   mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
   rename(InjSevName1 = InjSevName)
@@ -58,6 +60,13 @@ TOPS_data <- TOPS_data %>% mutate(ped_inj = ifelse(ROLE1 %in% c("BIKE", "PED"),
 TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(ped_inj == code)) %>% 
   mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
   rename(ped_inj_name = InjSevName)
+
+# bike or ped
+TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% "BIKE" | ROLE2 %in% "BIKE", 
+                                                            "Bicyclist", 
+                                                            ifelse(ROLE1 %in% "PED" | ROLE2 %in% "PED", 
+                                                                   "Pedestrian",
+                                                                   NA)))
 
 # Race names
 race <- data.frame(race_name = c("Asian", "Black", "Indian","Hispanic","White"), 
@@ -89,32 +98,14 @@ WI_schools <- WI_schools %>%
 
 school_symbol <- image_read_svg(path = "other/school_FILL0_wght400_GRAD0_opsz24.svg")
 
-## add county borders ----
-CountyBoundaries <- read_sf("data/WI_County_Boundaries_24K.geojson")
 
-focus_columns <- c("PedestrianInjurySeverity", "CrashDate", "CrashTime", "County", "Street", "CrossStreet", "PedestrianAge", "Year")
+focus_columns <- c("PedestrianInjurySeverity", "CrashDate", "CrashTime", "County", "Street", "CrossStreet", "PedestrianAge", "Year", "vulnerable_role")
 focus_county <- "DANE"
-
-## generate map with tmap ----
-# tmap_mode("view")
-# 
-# Pedestrian_Crash_Data <- TOPS_geom %>% 
-# #  filter(CNTYNAME == focus_county) %>%
-#   select(all_of(focus_columns))
-# 
-# tm_basemap("Stadia.AlidadeSmooth") +
-#   tm_shape(Pedestrian_Crash_Data) +
-#   tm_dots("PedestrianInjurySeverity", palette = injury_severity$color, popup.vars	= focus_columns)
-#   
-# tmap_save(file = "figures/dynamic_crash_maps/dynamic_crash_map.html")
-
 
 # generate map with leaflet ----
 Pedestrian_Crash_Data <- TOPS_data %>% 
   #  filter(CNTYNAME == focus_county) %>%
   select(c(all_of(focus_columns), "longitude", "latitude"))
-
-injury_severity_pal <- colorFactor(palette = injury_severity$color, domain = injury_severity$InjSevName)
 
 County_Crash_Data <- Pedestrian_Crash_Data %>%
   group_by(County, Year) %>%
@@ -196,9 +187,10 @@ wisconsin_crash_map <-
                    color = "black",
                    weight = 1,
                    fillOpacity = 0.8,
-                   label = lapply(paste0("<b>", Pedestrian_Crash_Data$CrashDate, "</b></br>",
+                   label = lapply(paste0("<b>", str_to_title(Pedestrian_Crash_Data$vulnerable_role)," </b><br>",
+                                         Pedestrian_Crash_Data$CrashDate, "</br>",
                                          Pedestrian_Crash_Data$PedestrianInjurySeverity, "</br>",
-                                         "pedestrian age: ", Pedestrian_Crash_Data$PedestrianAge), htmltools::HTML),
+                                         Pedestrian_Crash_Data$vulnerable_role, " age: ", Pedestrian_Crash_Data$PedestrianAge), htmltools::HTML),
                    group = "Crash Points") %>%
   addLegend(position = "bottomleft", labels = injury_severity$InjSevName, colors = injury_severity$color, group = "Crash Points", title = "Injury Severity") %>%
   addCircleMarkers(data = County_Crash_geom,
@@ -227,6 +219,6 @@ wisconsin_crash_map <-
   groupOptions(group = "Crash Points", zoomLevels = 10:20) %>%
   groupOptions(group ="Counties", zoomLevels = 1:9)
 
-saveWidget(wisconsin_crash_map, file = "figures/dynamic_crash_maps/wisconsin_crash_map.html", selfcontained = TRUE)
+saveWidget(wisconsin_crash_map, file = "figures/dynamic_crash_maps/wisconsin_pedestrian_crash_map.html", selfcontained = TRUE)
 
 
