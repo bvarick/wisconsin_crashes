@@ -219,13 +219,14 @@ wisconsin_crash_map <-
               fillColor=county_pal(County_Crash_geom$CrashesPerPopulation),
               fillOpacity = 0.6,
               label = lapply(paste0("<b>", str_to_title(County_Crash_geom$County), " County</b></br>",
-                                    "average crashes/year: ", round(County_Crash_geom$MeanCrashes,0), "</br>",
-                                    "average crashes/100k residents: ", round(County_Crash_geom$CrashesPerPopulation,0)), htmltools::HTML),
+                                    "population: ", County_Crash_geom$value, "<br>",
+                                    "average crashes per year: ", round(County_Crash_geom$MeanCrashes,0), "</br>",
+                                    "average crashes/year per 100k residents: ", round(County_Crash_geom$CrashesPerPopulation,0)), htmltools::HTML),
               group = "Counties") %>%
-  addLegend(position = "bottomleft", pal = county_pal, values = County_Crash_geom$CrashesPerPopulation, group = "Counties", title = "Circle size = raw crashes<br><br>Color = Crashes/year</br>(normalized per 100k residents)") %>%
+  addLegend(position = "bottomleft", pal = county_pal, values = County_Crash_geom$CrashesPerPopulation, group = "Counties", title = "Circle size = county population<br><br>Color = Crashes/year</br>(normalized per 100k residents)") %>%
     #  addLegendSize(position = "bottomright", color = "black", shape = "circle", values = County_Crash_geom$value, group = "Counties", title = "Total crashes") %>%
   groupOptions(group ="Counties", zoomLevels = 1:9)
 
-saveWidget(wisconsin_crash_map, file = "figures/dynamic_crash_maps/wisconsin_crash_map.html")
+saveWidget(wisconsin_crash_map, file = "figures/dynamic_crash_maps/wisconsin_crash_map.html", selfcontained = TRUE)
 
 
