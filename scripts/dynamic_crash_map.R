@@ -35,7 +35,7 @@ TOPS_data <- TOPS_data %>%
          year = as.factor(year(date)))
 
 retrieve_date <- max(TOPS_data %>% filter(year %in% max(year(TOPS_data$date), na.rm = TRUE)) %>% pull(retreive_date))
-  
+
 
 # Injury Severy Index and Color -----
 injury_severity <- data.frame(InjSevName = c("No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
@@ -177,8 +177,8 @@ tag.map.subtitle <- tags$style(HTML("
 
 wisconsin_crash_map <- 
   leaflet(options = leafletOptions(preferCanvas = TRUE)) %>%
-#  addControl(title, position = "topleft", className="map-title") %>%
-#  addControl(subtitle, position = "bottomleft", className="map-subtitle") %>%
+  #  addControl(title, position = "topleft", className="map-title") %>%
+  #  addControl(subtitle, position = "bottomleft", className="map-subtitle") %>%
   addProviderTiles(providers$Stadia.AlidadeSmooth) %>%
   addMarkers(data = WI_schools,
              lng=WI_schools$LON,
@@ -187,33 +187,31 @@ wisconsin_crash_map <-
                                    WI_schools$DISTRICT, " School District</br>",
                                    WI_schools$SCHOOLTYPE), htmltools::HTML),
              group = "Schools") %>%
-  groupOptions(group = "Schools", zoomLevels = 13:20) %>%
   addCircleMarkers(data = Pedestrian_Crash_Data,
                    lng=Pedestrian_Crash_Data$longitude,
                    lat=Pedestrian_Crash_Data$latitude,
                    fillColor=injury_severity_pal(Pedestrian_Crash_Data$PedestrianInjurySeverity),
-                   radius=3,
+                   radius=4,
                    stroke=TRUE,
                    color = "black",
                    weight = 1,
                    fillOpacity = 0.8,
                    label = lapply(paste0("<b>", Pedestrian_Crash_Data$CrashDate, "</b></br>",
-                                  Pedestrian_Crash_Data$PedestrianInjurySeverity, "</br>",
-                                  "pedestrian age: ", Pedestrian_Crash_Data$PedestrianAge), htmltools::HTML),
+                                         Pedestrian_Crash_Data$PedestrianInjurySeverity, "</br>",
+                                         "pedestrian age: ", Pedestrian_Crash_Data$PedestrianAge), htmltools::HTML),
                    group = "Crash Points") %>%
   addLegend(position = "bottomleft", labels = injury_severity$InjSevName, colors = injury_severity$color, group = "Crash Points", title = "Injury Severity") %>%
-  groupOptions(group = "Crash Points", zoomLevels = 10:20) %>%
-    addCircleMarkers(data = County_Crash_geom,
-                     lng=County_Crash_geom$longitude,
-                     lat=County_Crash_geom$latitude,
-                     #fillColor=county_pal(County_Crash_geom$CrashesPerPopulation),
-                     radius=County_Crash_geom$value/20000,
-                     stroke = TRUE,
-                     color = "black",
-                     weight = 1,
-                     fillOpacity = 0.5,
-                     group = "Counties") %>%
-    addPolygons(data = County_Crash_geom,
+  addCircleMarkers(data = County_Crash_geom,
+                   lng=County_Crash_geom$longitude,
+                   lat=County_Crash_geom$latitude,
+                   #fillColor=county_pal(County_Crash_geom$CrashesPerPopulation),
+                   radius=County_Crash_geom$value/20000,
+                   stroke = TRUE,
+                   color = "black",
+                   weight = 1,
+                   fillOpacity = 0.5,
+                   group = "Counties") %>%
+  addPolygons(data = County_Crash_geom,
               color = "black",
               weight = 1,
               fillColor=county_pal(County_Crash_geom$CrashesPerPopulation),
@@ -224,7 +222,9 @@ wisconsin_crash_map <-
                                     "average crashes/year per 100k residents: ", round(County_Crash_geom$CrashesPerPopulation,0)), htmltools::HTML),
               group = "Counties") %>%
   addLegend(position = "bottomleft", pal = county_pal, values = County_Crash_geom$CrashesPerPopulation, group = "Counties", title = "Circle size = county population<br><br>Color = Crashes/year</br>(normalized per 100k residents)") %>%
-    #  addLegendSize(position = "bottomright", color = "black", shape = "circle", values = County_Crash_geom$value, group = "Counties", title = "Total crashes") %>%
+  #  addLegendSize(position = "bottomright", color = "black", shape = "circle", values = County_Crash_geom$value, group = "Counties", title = "Total crashes") %>%
+  groupOptions(group = "Schools", zoomLevels = 13:20) %>%
+  groupOptions(group = "Crash Points", zoomLevels = 10:20) %>%
   groupOptions(group ="Counties", zoomLevels = 1:9)
 
 saveWidget(wisconsin_crash_map, file = "figures/dynamic_crash_maps/wisconsin_crash_map.html", selfcontained = TRUE)
