@@ -96,7 +96,11 @@ WI_schools <- WI_schools %>%
          LAT > 0) %>%
   select("SCHOOL", "DISTRICT", "SCHOOLTYPE", "LAT", "LON")
 
-school_symbol <- image_read_svg(path = "other/school_FILL0_wght400_GRAD0_opsz24.svg")
+school_symbol <- makeIcon(iconUrl = "other/school_FILL0_wght400_GRAD0_opsz24.png",
+                          iconWidth = 24,
+                          iconHeight = 24,
+                          iconAnchorX = 12,
+                          iconAnchorY = 12)
 
 
 focus_columns <- c("PedestrianInjurySeverity", "CrashDate", "CrashTime", "County", "Street", "CrossStreet", "PedestrianAge", "Year", "vulnerable_role")
@@ -171,9 +175,15 @@ wisconsin_crash_map <-
   #  addControl(title, position = "topleft", className="map-title") %>%
   #  addControl(subtitle, position = "bottomleft", className="map-subtitle") %>%
   addProviderTiles(providers$Stadia.AlidadeSmooth) %>%
+  addPolygons(data = County_Crash_geom,
+              color = "black",
+              weight = 1,
+              fill = FALSE,
+              group = "Crash Points") %>%
   addMarkers(data = WI_schools,
              lng=WI_schools$LON,
              lat = WI_schools$LAT,
+             icon = school_symbol,
              label = lapply(paste0("<b>", WI_schools$SCHOOL, " School</b></br>",
                                    WI_schools$DISTRICT, " School District</br>",
                                    WI_schools$SCHOOLTYPE), htmltools::HTML),
@@ -193,16 +203,16 @@ wisconsin_crash_map <-
                                          Pedestrian_Crash_Data$vulnerable_role, " age: ", Pedestrian_Crash_Data$PedestrianAge), htmltools::HTML),
                    group = "Crash Points") %>%
   addLegend(position = "bottomleft", labels = injury_severity$InjSevName, colors = injury_severity$color, group = "Crash Points", title = "Injury Severity") %>%
-  addCircleMarkers(data = County_Crash_geom,
-                   lng=County_Crash_geom$longitude,
-                   lat=County_Crash_geom$latitude,
-                   #fillColor=county_pal(County_Crash_geom$CrashesPerPopulation),
-                   radius=County_Crash_geom$value/20000,
-                   stroke = TRUE,
-                   color = "black",
-                   weight = 1,
-                   fillOpacity = 0.5,
-                   group = "Counties") %>%
+#  addCircleMarkers(data = County_Crash_geom,
+#                   lng=County_Crash_geom$longitude,
+#                   lat=County_Crash_geom$latitude,
+#                   #fillColor=county_pal(County_Crash_geom$CrashesPerPopulation),
+#                   radius=County_Crash_geom$value/20000,
+#                   stroke = TRUE,
+#                   color = "black",
+#                   weight = 1,
+#                   fillOpacity = 0.5,
+#                   group = "Counties") %>%
   addPolygons(data = County_Crash_geom,
               color = "black",
               weight = 1,
@@ -213,12 +223,15 @@ wisconsin_crash_map <-
                                     "average crashes per year: ", round(County_Crash_geom$MeanCrashes,0), "</br>",
                                     "average crashes/year per 100k residents: ", round(County_Crash_geom$CrashesPerPopulation,0)), htmltools::HTML),
               group = "Counties") %>%
-  addLegend(position = "bottomleft", pal = county_pal, values = County_Crash_geom$CrashesPerPopulation, group = "Counties", title = "Circle size = county population<br><br>Color = Crashes/year</br>(normalized per 100k residents)") %>%
+  addLegend(position = "bottomleft", pal = county_pal, values = County_Crash_geom$CrashesPerPopulation, group = "Counties", title = "Crashes/year</br>(normalized per 100k residents)") %>%
   #  addLegendSize(position = "bottomright", color = "black", shape = "circle", values = County_Crash_geom$value, group = "Counties", title = "Total crashes") %>%
   groupOptions(group = "Schools", zoomLevels = 13:20) %>%
   groupOptions(group = "Crash Points", zoomLevels = 10:20) %>%
   groupOptions(group ="Counties", zoomLevels = 1:9)
+  
+wisconsin_crash_map
 
 saveWidget(wisconsin_crash_map, file = "figures/dynamic_crash_maps/wisconsin_pedestrian_crash_map.html", selfcontained = TRUE)
+
 
 
