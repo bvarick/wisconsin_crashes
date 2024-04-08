@@ -37,10 +37,10 @@ TOPS_data <- TOPS_data %>%
 retrieve_date <- max(TOPS_data %>% filter(year %in% max(year(TOPS_data$date), na.rm = TRUE)) %>% pull(retreive_date))
 
 
-# Injury Severy Index and Color -----
-injury_severity <- data.frame(InjSevName = c("No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
-                              code = c("O", "C", "B", "A", "K"),
-                              color = c("#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
+# Injury Severity Index and Color -----
+injury_severity <- data.frame(InjSevName = c("Injury Severity Unknown", "No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
+                              code = c(NA, "O", "C", "B", "A", "K"),
+                              color = c("grey", "#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
 
 injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = injury_severity$InjSevName)
 
@@ -51,9 +51,13 @@ TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), 
   mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
   rename(InjSevName2 = InjSevName)
 
-TOPS_data <- TOPS_data %>% mutate(ped_inj = ifelse(ROLE1 %in% c("BIKE", "PED"), 
+bike_roles <- c("BIKE", "O BIKE")
+ped_roles <- c("PED", "O PED", "PED NO")
+vuln_roles <- c(bike_roles, ped_roles)
+
+TOPS_data <- TOPS_data %>% mutate(ped_inj = ifelse(ROLE1 %in% vuln_roles, 
                                                    INJSVR1, 
-                                                   ifelse(ROLE2 %in% c("BIKE", "PED"), 
+                                                   ifelse(ROLE2 %in% vuln_roles, 
                                                           INJSVR2,
                                                           NA)))
 
@@ -62,9 +66,9 @@ TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), 
   rename(ped_inj_name = InjSevName)
 
 # bike or ped
-TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% "BIKE" | ROLE2 %in% "BIKE", 
+TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% bike_roles | ROLE2 %in% bike_roles, 
                                                             "Bicyclist", 
-                                                            ifelse(ROLE1 %in% "PED" | ROLE2 %in% "PED", 
+                                                            ifelse(ROLE1 %in% ped_roles | ROLE2 %in% ped_roles, 
                                                                    "Pedestrian",
                                                                    NA)))
 
@@ -84,7 +88,7 @@ TOPS_data <- TOPS_data %>%
          County = CNTYNAME,
          Street = ONSTR,
          CrossStreet = ATSTR) %>%
-  mutate(PedestrianAge = ifelse(ROLE1 %in% c("BIKE", "PED"), age1, age2))
+  mutate(PedestrianAge = ifelse(ROLE1 %in% vuln_roles, age1, age2))
 
 
 TOPS_geom <- st_as_sf(TOPS_data %>% filter(!is.na(latitude)), coords = c("longitude", "latitude"), crs = 4326)
@@ -197,10 +201,10 @@ wisconsin_crash_map <-
                    color = "black",
                    weight = 1,
                    fillOpacity = 0.8,
-                   label = lapply(paste0("<b>", str_to_title(Pedestrian_Crash_Data$vulnerable_role)," </b><br>",
+                   label = lapply(paste0("<b>", str_to_title(replace_na(Pedestrian_Crash_Data$vulnerable_role, ""))," </b><br>",
                                          Pedestrian_Crash_Data$CrashDate, "</br>",
                                          Pedestrian_Crash_Data$PedestrianInjurySeverity, "</br>",
-                                         Pedestrian_Crash_Data$vulnerable_role, " age: ", Pedestrian_Crash_Data$PedestrianAge), htmltools::HTML),
+                                         replace_na(Pedestrian_Crash_Data$vulnerable_role, ""), " age: ", ifelse(!is.na(Pedestrian_Crash_Data$PedestrianAge), Pedestrian_Crash_Data$PedestrianAge, "unknown age")), htmltools::HTML),
                    group = "Crash Points") %>%
   addLegend(position = "bottomleft", labels = injury_severity$InjSevName, colors = injury_severity$color, group = "Crash Points", title = "Injury Severity") %>%
 #  addCircleMarkers(data = County_Crash_geom,
