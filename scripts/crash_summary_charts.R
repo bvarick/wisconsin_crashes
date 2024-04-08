@@ -43,11 +43,24 @@ TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), 
   mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
   rename(InjSevName2 = InjSevName)
 
-TOPS_data <- TOPS_data %>% mutate(ped_inj = ifelse(ROLE1 %in% c("BIKE", "PED"), 
+# add bike or pedestrian roles ----
+
+bike_roles <- c("BIKE", "O BIKE")
+ped_roles <- c("PED", "O PED", "PED NO")
+vuln_roles <- c(bike_roles, ped_roles)
+
+TOPS_data <- TOPS_data %>% mutate(ped_inj = ifelse(ROLE1 %in% vuln_roles, 
                                                    INJSVR1, 
-                                                   ifelse(ROLE2 %in% c("BIKE", "PED"), 
+                                                   ifelse(ROLE2 %in% vuln_roles, 
                                                           INJSVR2,
                                                           NA)))
+
+# bike or ped
+TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% bike_roles | ROLE2 %in% bike_roles, 
+                                                           "Bicyclist", 
+                                                           ifelse(ROLE1 %in% ped_roles | ROLE2 %in% ped_roles, 
+                                                                  "Pedestrian",
+                                                                  NA)))
 
 TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(ped_inj == code)) %>% 
   mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
@@ -69,7 +82,7 @@ TOPS_data <- TOPS_data %>%
          County = CNTYNAME,
          Street = ONSTR,
          CrossStreet = ATSTR) %>%
-  mutate(PedestrianAge = ifelse(ROLE1 %in% c("BIKE", "PED"), age1, age2))
+  mutate(PedestrianAge = ifelse(ROLE1 %in% vuln_roles, age1, age2))
 
 # add population census data ----
 census_api_key(key = substr(read_file(file = "api_keys/census_api_key"), 1, 40))
@@ -87,6 +100,7 @@ county_focus <- unique(TOPS_data %>%
 
 
 TOPS_data %>%
+  filter(ped_inj %in% c("A", "K")) %>%
   group_by(CNTYNAME, Year) %>%
   summarise(TotalCrashes = n()) %>%
   mutate(County = CNTYNAME) %>%
@@ -100,6 +114,7 @@ TOPS_data %>%
                 group = CNTYNAME),
             size = 1) +
   geom_label_repel(data = TOPS_data %>%
+                     filter(ped_inj %in% c("A", "K")) %>%
                      group_by(CNTYNAME, Year) %>%
                      summarise(TotalCrashes = n()) %>%
                      mutate(County = CNTYNAME) %>%
@@ -120,7 +135,7 @@ TOPS_data %>%
   scale_fill_brewer(type = "qual", guide = NULL) +
   scale_x_discrete(expand = expansion(add = c(0.5,0.75))) +
   labs(title = "Drivers crashing into pedestrians & bicyclists per 100,000 residents",
-       subtitle = "2017-2023",
+       subtitle = "Fatalities and Severe Injuries | 2017-2023",
        x = "Year",
        y = "Total crashes per year per 100,000 residents",
        color = "County",
@@ -134,4 +149,23 @@ ggsave(file = paste0("figures/crash_summaries/counties_year.pdf"),
        height = 8.5,
        width = 11,
        units = "in")
-e
+
+TOPS_data %>%
+  filter(County %in% county_focus) %>%
+  group_by(County, vulnerable_role) %>%
+  summarise(count = n()) %>%
+  ggplot() +
+  geom_col(aes(x = County,
+               y = count,
+               fill = vulnerable_role))
+
+
+TOPS_data %>%
+  filter(County %in% "DANE") %>%
+  group_by(County, vulnerable_role, year) %>%
+  summarise(count = n()) %>%
+  ggplot() +
+  geom_col(aes(x = year,
+               y = count,
+               fill = vulnerable_role),
+           position = position_dodge())
