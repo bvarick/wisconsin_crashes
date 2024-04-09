@@ -134,7 +134,7 @@ for(county in county_focus) {
   message(county)
   TOPS_data %>% 
     filter(CNTYNAME %in% county) %>% 
-    filter(ROLE1 %in% c("BIKE", "PED") & age1 < 18 | ROLE2 %in% c("BIKE", "PED") & age2 < 18) %>% 
+    filter(ROLE1 %in% vuln_roles & age1 < 18 | ROLE2 %in% vuln_roles & age2 < 18) %>% 
     group_by(year) %>% summarise(count = n_distinct(DOCTNMBR)) %>%
     ggplot() +
     geom_col(aes(x = year,

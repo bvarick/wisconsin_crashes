@@ -48,11 +48,41 @@ counties <- data.frame(name = c("Dane", "Milwaukee"),
                        COUNTY = c("DANE", "MILWAUKEE"))
 # Injury Severy Index and Color -------------------------------------------
 # injury severity index
-injury_severity <- data.frame(InjSevName = c("No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
-                              code = c("O", "C", "B", "A", "K"),
-                              color = c("#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
+injury_severity <- data.frame(InjSevName = c("Injury severity unknown", "No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
+                              code = c(NA, "O", "C", "B", "A", "K"),
+                              color = c("grey", "#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
 
-TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR == code)) %>% mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName))
+TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR1 == code)) %>% 
+  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
+  rename(InjSevName1 = InjSevName)
+TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR2 == code)) %>% 
+  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
+  rename(InjSevName2 = InjSevName)
+
+# add bike or pedestrian roles ----
+
+bike_roles <- c("BIKE", "O BIKE")
+ped_roles <- c("PED", "O PED", "PED NO")
+vuln_roles <- c(bike_roles, ped_roles)
+
+TOPS_data <- TOPS_data %>% mutate(ped_inj = ifelse(ROLE1 %in% vuln_roles, 
+                                                   INJSVR1, 
+                                                   ifelse(ROLE2 %in% vuln_roles, 
+                                                          INJSVR2,
+                                                          NA)))
+
+TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(ped_inj == code)) %>% 
+  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
+  rename(ped_inj_name = InjSevName)
+
+# bike or ped
+TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% bike_roles | ROLE2 %in% bike_roles, 
+                                                           "Bicyclist", 
+                                                           ifelse(ROLE1 %in% ped_roles | ROLE2 %in% ped_roles, 
+                                                                  "Pedestrian",
+                                                                  NA)))
+
+
 
 
 # ---- add additional data
@@ -97,7 +127,7 @@ WI_schools <- left_join(WI_schools %>% mutate(district_school = paste0(SDID, SCH
 #                                        "#d7191c"))
 
 # register stadia API key ----
-register_stadiamaps(key = substr(read_file(file = "api_keys/stadia_api_key"), 1, 36))
+register_stadiamaps(key = read_file(file = "api_keys/stadia_api_key"))
 #options(ggmap.file_drawer = "data/basemaps")
 # dir.create(file_drawer(), recursive = TRUE, showWarnings = FALSE)
 # saveRDS(list(), file_drawer("index.rds"))
@@ -140,7 +170,7 @@ for(county in county_focus) {
   message(county)
   TOPS_data %>% 
     filter(CNTYNAME %in% county) %>% 
-    filter(ROLE1 %in% c("BIKE", "PED") & age1 < 18 | ROLE2 %in% c("BIKE", "PED") & age2 < 18) %>% 
+    filter(ROLE1 %in% vuln_roles & age1 < 18 | ROLE2 %in% vuln_roles & age2 < 18) %>% 
     group_by(year) %>% summarise(count = n_distinct(DOCTNMBR)) %>%
     ggplot() +
     geom_col(aes(x = year,
@@ -320,9 +350,9 @@ generate_school_maps <- function(district) {
       # add crash locations
       new_scale_fill() +
       geom_point(data = TOPS_data %>%
-                   filter(ROLE1 %in% c("BIKE", "PED") 
+                   filter(ROLE1 %in% vuln_roles 
                           & age1 < 18 
-                          | ROLE2 %in% c("BIKE", "PED") 
+                          | ROLE2 %in% vuln_roles 
                           & age2 < 18
                           ) %>%
                    filter(longitude >= as.double(bbox[1]),
@@ -331,10 +361,10 @@ generate_school_maps <- function(district) {
                           latitude <= as.double(bbox[4])),
                  aes(x = longitude,
                      y = latitude,
-                     fill = InjSevName),
+                     fill = ped_inj_name),
                  shape = 23,
                  size = 3) +
-      scale_fill_manual(values = injury_severity$color, name = "Crash Severity") +
+      scale_fill_manual(values = setNames(as.character(injury_severity$color), injury_severity$InjSevName), name = "Crash Severity") +
       # add walk boundary
       new_scale_color() +
       new_scale_fill() +
@@ -389,7 +419,7 @@ generate_school_maps <- function(district) {
 ## generate maps in parallel ----
 mclapply(district_focus,
          generate_school_maps,
-         mc.cores = 12,
+         mc.cores = 10,
          mc.cleanup = TRUE,
          mc.preschedule = TRUE,
          mc.silent = FALSE)
