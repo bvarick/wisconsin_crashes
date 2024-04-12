@@ -158,21 +158,7 @@ title <- tags$div(
                              min(year(TOPS_data$date), na.rm = TRUE),
                              " - ",
                              max(year(TOPS_data$date), na.rm = TRUE)))
-)  
-
-tag.map.subtitle <- tags$style(HTML("
-  .leaflet-control.map-subtitle { 
-    transform: translate(0%,20%);
-    position: fixed !important;
-    left: 90%;
-    text-align: center;
-    padding-left: 10px; 
-    padding-right: 10px; 
-    background: rgba(255,255,255,0.75);
-    font-weight: regular;
-    font-size: 12px;
-  }
-"))
+) 
 
 wisconsin_crash_map <- 
   leaflet(options = leafletOptions(preferCanvas = TRUE)) %>%
@@ -235,7 +221,13 @@ wisconsin_crash_map <-
   
 wisconsin_crash_map
 
-saveWidget(wisconsin_crash_map, file = "figures/dynamic_crash_maps/wisconsin_pedestrian_crash_map.html", selfcontained = TRUE)
+saveWidget(wisconsin_crash_map, file = "figures/dynamic_crash_maps/wisconsin_pedestrian_crash_map.html", 
+           selfcontained = TRUE,
+           title = "Wisconsin Bike & Pedestrian Crash Map")
 
+wisconsin_crash_map_title <- wisconsin_crash_map %>%
+  addControl(title, position = "topleft", className="map-title")
 
-
+saveWidget(wisconsin_crash_map_title, file = "figures/dynamic_crash_maps/wisconsin_pedestrian_crash_map_title.html", 
+           selfcontained = TRUE,
+           title = "Wisconsin Bike & Pedestrian Crash Map")
