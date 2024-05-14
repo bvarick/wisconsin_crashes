@@ -292,8 +292,15 @@ saveWidget(wisconsin_crash_map_es, file = "figures/dynamic_crash_maps/wisconsin_
            selfcontained = TRUE,
            title = "Mapa de Choques de Bicicletas y Peatones en Wisconsin")
 
+title_es <- tags$div(
+  tag.map.title, HTML(paste0("Peatones y ciclistas involucrados en un choque</br>",
+                             min(year(TOPS_data$date), na.rm = TRUE),
+                             " - ",
+                             max(year(TOPS_data$date), na.rm = TRUE)))
+) 
+
 wisconsin_crash_map_es_title <- wisconsin_crash_map_es %>%
-  addControl(title, position = "topleft", className="map-title")
+  addControl(title_es, position = "topleft", className="map-title")
 
 saveWidget(wisconsin_crash_map_es_title, file = "figures/dynamic_crash_maps/wisconsin_pedestrian_crash_map_es_title.html", 
            selfcontained = TRUE,
