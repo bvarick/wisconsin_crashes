@@ -46,14 +46,41 @@ retrieve_date <- max(TOPS_data %>% filter(year %in% max(year(TOPS_data$date), na
 counties <- data.frame(name = c("Dane", "Milwaukee"),
                        CNTYCODE = c(13, 40),
                        COUNTY = c("DANE", "MILWAUKEE"))
+
 # Injury Severy Index and Color -------------------------------------------
 # injury severity index
-injury_severity <- data.frame(InjSevName = c("No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
-                              code = c("O", "C", "B", "A", "K"),
-                              color = c("#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
+injury_severity <- data.frame(InjSevName = c("Injury severity unknown", "No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
+                              code = c(NA, "O", "C", "B", "A", "K"),
+                              color = c("grey", "#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
 
-TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR == code)) %>% mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName))
+TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR1 == code)) %>% 
+  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
+  rename(InjSevName1 = InjSevName)
+TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR2 == code)) %>% 
+  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
+  rename(InjSevName2 = InjSevName)
+# add bike or pedestrian roles ----
 
+bike_roles <- c("BIKE", "O BIKE")
+ped_roles <- c("PED", "O PED", "PED NO")
+vuln_roles <- c(bike_roles, ped_roles)
+
+TOPS_data <- TOPS_data %>% mutate(ped_inj = ifelse(ROLE1 %in% vuln_roles, 
+                                                   INJSVR1, 
+                                                   ifelse(ROLE2 %in% vuln_roles, 
+                                                          INJSVR2,
+                                                          NA)))
+
+TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(ped_inj == code)) %>% 
+  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
+  rename(ped_inj_name = InjSevName)
+
+# bike or ped
+TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% bike_roles | ROLE2 %in% bike_roles, 
+                                                           "Bicyclist", 
+                                                           ifelse(ROLE1 %in% ped_roles | ROLE2 %in% ped_roles, 
+                                                                  "Pedestrian",
+                                                                  NA)))
 
 # ---- add additional data
 ## add school enrollment data
@@ -116,14 +143,13 @@ school_symbol <- image_read_svg(path = "other/school_FILL0_wght400_GRAD0_opsz24.
 
 #county_focus <- str_to_upper(unique(WI_schools %>% pull(CTY_DIST)))
 #county_focus <- c("DANE")
-county_focus <- c("MILWAUKEE")
+county_focus <- c("DANE")
 
 #school_type_focus <- unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus)) %>% pull(SCHOOLTYPE))
 school_type_focus <- c("High School")
 
 #district_focus <- unique(WI_schools %>%   filter(CTY_DIST %in% str_to_title(county_focus),  SCHOOLTYPE %in% school_type_focus, !is.na(DISTRICT_NAME)) %>%  pull(DISTRICT_NAME))
-#district_focus <- c("Madison Metropolitan")
-district_focus <- c("Milwaukee")
+district_focus <- c("Madison Metropolitan")
 
 school_number <- length(unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus),  
                                               SCHOOLTYPE %in% school_type_focus, 
@@ -290,9 +316,11 @@ for(district in district_focus) {
     
     # generate map
     ggmap(basemap) +
-      labs(title = paste0("Crashes between cars and youth (<18) pedestrians/bicyclists near ",
-                          school_data %>% pull(SCHOOL_NAME),
-                          " School"),
+      labs(title = paste0(
+        "Crashes between cars and youth (<18) pedestrians/bicyclists near ",
+#        "Crashes between cars and all pedestrians/bicyclists near ",
+        school_data %>% pull(SCHOOL_NAME),
+        " School"),
            subtitle = paste0(school_data %>% pull(DISTRICT_NAME),
                              " School District | ",
                              min(year(TOPS_data$date), na.rm = TRUE), 
@@ -328,7 +356,7 @@ for(district in district_focus) {
                           latitude <= as.double(bbox[4])),
                  aes(x = longitude,
                      y = latitude,
-                     fill = InjSevName),
+                     fill = ped_inj_name),
                  shape = 23,
                  size = 3) +
       scale_fill_manual(values = injury_severity$color, name = "Crash Severity") +
@@ -380,8 +408,8 @@ for(district in district_focus) {
            units = "in",
            create.dir = TRUE)
   }
-  districts_done <- bind_rows(districts_done, data.frame(district = c(district)))
-  write_csv(districts_done, file = "other/districts_done.csv")
+#  districts_done <- bind_rows(districts_done, data.frame(district = c(district)))
+#  write_csv(districts_done, file = "other/districts_done.csv")
 }
 
 # double check that all schools have a map ----
