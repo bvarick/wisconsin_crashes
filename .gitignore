@@ -1,6 +1,7 @@
 data/TOPS/*
 basemaps/*
 figures/school_maps/*
+figures/municipalities/*
 api_keys/*
 basemaps/*
 .Rproj.user
