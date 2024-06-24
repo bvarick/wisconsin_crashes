@@ -149,7 +149,7 @@ county_focus <- c("DANE")
 school_type_focus <- c("High School")
 
 #district_focus <- unique(WI_schools %>%   filter(CTY_DIST %in% str_to_title(county_focus),  SCHOOLTYPE %in% school_type_focus, !is.na(DISTRICT_NAME)) %>%  pull(DISTRICT_NAME))
-district_focus <- c("Madison Metropolitan")
+district_focus <- c("Monona Grove")
 
 school_number <- length(unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus),  
                                               SCHOOLTYPE %in% school_type_focus, 
@@ -317,8 +317,8 @@ for(district in district_focus) {
     # generate map
     ggmap(basemap) +
       labs(title = paste0(
-        "Crashes between cars and youth (<18) pedestrians/bicyclists near ",
-#        "Crashes between cars and all pedestrians/bicyclists near ",
+#        "Crashes between cars and youth (<18) pedestrians/bicyclists near ",
+        "Crashes between cars and all pedestrians/bicyclists near ",
         school_data %>% pull(SCHOOL_NAME),
         " School"),
            subtitle = paste0(school_data %>% pull(DISTRICT_NAME),
@@ -337,18 +337,18 @@ for(district in district_focus) {
             plot.caption = element_text(color = "grey")) +
       
       ## add bike lts
-      #geom_sf(data = bike_lts[[county]],
-      #       inherit.aes = FALSE,
-      #       aes(color = lts)) +
-      #scale_color_manual(values = bike_lts_scale$color, name = "Bike Level of Traffic Stress") +
+      geom_sf(data = bike_lts[[county]],
+             inherit.aes = FALSE,
+             aes(color = lts)) +
+      scale_color_manual(values = bike_lts_scale$color, name = "Bike Level of Traffic Stress") +
       
       # add crash locations
       new_scale_fill() +
       geom_point(data = TOPS_data %>%
                    filter(ROLE1 %in% c("BIKE", "PED") 
-                          & age1 < 18 
+#                          & age1 < 18 
                           | ROLE2 %in% c("BIKE", "PED") 
-                          & age2 < 18
+#                          & age2 < 18
                           ) %>%
                    filter(longitude >= as.double(bbox[1]),
                           latitude >= as.double(bbox[2]),
@@ -400,8 +400,8 @@ for(district in district_focus) {
                          "s/",
                          str_replace_all(school_data %>% pull(SCHOOL_NAME), "/", "-"), 
                          " School.pdf"),
-                                  
-           title = paste0(school_data %>% pull(SCHOOL), " Youth Pedestrian/Bike crashes"),
+           #title = paste0(school_data %>% pull(SCHOOL), " Youth Pedestrian/Bike crashes"),
+           title = paste0(school_data %>% pull(SCHOOL), " All Pedestrian/Bike crashes"),
            device = pdf,
            height = 8.5,
            width = 11,
@@ -425,7 +425,8 @@ for(school in WI_schools$district_school) {
                                                            str_replace_all(school_data %>% pull(SCHOOLTYPE), "/","-"), 
                                                            "s/",
                                                            str_replace_all(school_data %>% pull(SCHOOL_NAME), "/", "-"), 
-                                                           " School.pdf"))))
+                                                           #" School.pdf"))))
+                                                           " School_all.pdf"))))
   double_check[[school]] <- school_check
 }
 double_check <- bind_rows(double_check)
