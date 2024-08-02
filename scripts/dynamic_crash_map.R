@@ -129,6 +129,7 @@ Pedestrian_Crash_Data <- TOPS_data %>%
   select(c(all_of(focus_columns), "longitude", "latitude"))
 
 County_Crash_Data <- Pedestrian_Crash_Data %>%
+  filter(PedestrianInjurySeverity %in% c("Fatality", "Suspected Serious Injury", "Suspected Minor Injury")) %>%
   group_by(County, Year) %>%
   summarise(TotalCrashes = n(),
             longitude = mean(longitude, na.rm = TRUE),
@@ -150,6 +151,35 @@ County_Crash_geom <- County_Crash_geom %>%
 County_Crash_geom$CrashesPerPopulation[is.na(County_Crash_geom$CrashesPerPopulation)] <- 0
 
 county_pal <- colorNumeric(palette = "YlOrRd", domain = c(min(County_Crash_geom$CrashesPerPopulation, na.rm = TRUE), max(County_Crash_geom$CrashesPerPopulation, na.rm = TRUE)))
+
+# ---- census block data
+census_year <- 2020
+state <- "WI" 
+
+tract_data <- st_transform(get_decennial(
+  geography = "tract", 
+  variables = "P1_001N", # Total population variable for 2020 census
+  state = state, 
+  year = census_year, 
+  geometry = TRUE
+),
+crs = 4326)
+
+Census_Crash_geom <- st_join(tract_data, 
+        st_as_sf(Pedestrian_Crash_Data %>% filter(PedestrianInjurySeverity %in% c("Fatality", "Suspected Serious Injury", "Suspected Minor Injury"),
+                                                  latitude > 0), 
+                 coords = c("longitude", "latitude"), 
+                 crs = 4326), 
+        join = st_contains) %>%
+  group_by(GEOID, value) %>%
+  summarize(crash_count = n()) %>%
+  filter(value > 0) %>%
+  mutate(CrashesPerPopulation = crash_count/(value/100000))
+
+census_pal <- colorNumeric(palette = "YlOrRd", domain = c(min(Census_Crash_geom$CrashesPerPopulation, na.rm = TRUE), 3000))
+
+
+#---- make map
 
 #title style
 tag.map.title <- tags$style(HTML("
@@ -220,7 +250,7 @@ wisconsin_crash_map <-
   groupOptions(group = "Schools", zoomLevels = 13:20) %>%
   groupOptions(group = "Crash Points", zoomLevels = 10:20) %>%
   groupOptions(group ="Counties", zoomLevels = 1:9)
-  
+
 wisconsin_crash_map
 
 saveWidget(wisconsin_crash_map, file = "figures/dynamic_crash_maps/wisconsin_pedestrian_crash_map.html", 

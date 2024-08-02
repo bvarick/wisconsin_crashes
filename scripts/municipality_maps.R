@@ -117,10 +117,12 @@ school_symbol <- image_read_svg(path = "other/school_FILL0_wght400_GRAD0_opsz24.
 
 #county_focus <- str_to_upper(unique(WI_schools %>% pull(CTY_DIST)))
 #county_focus <- c("DANE")
-county_focus <- c("DANE")
+county_focus <- "Dane"
 
-municipality_focus <- c("Monona", "Verona", "Fitchburg")
 municipality_geom <- st_read("data/WI_Cities,_Towns_and_Villages_January_2024.geojson")
+#municipality_focus <- c("Mcfarland")
+#municipality_focus <- c("Monona", "Fitchburg")
+municipality_focus <- municipality_geom %>% filter(CNTY_NAME == county_focus) %>% pull(MCD_NAME)
 
 for(municipality in municipality_focus) {
   
@@ -131,8 +133,10 @@ for(municipality in municipality_focus) {
   readRDS(file_drawer("index.rds"))
   file_drawer("index.rds")
   
+  municipality_filtered <- municipality_geom %>% filter(CNTY_NAME == county_focus, MCD_NAME == municipality) %>% pull(geometry)
+  
   # create bounding box from school, 5km away.
-  bbox_poly <- st_transform(st_buffer(municipality_geom %>% filter(MCD_NAME == municipality) %>% pull(geometry), 1000), crs = 4326)
+  bbox_poly <- st_transform(st_buffer(municipality_filtered, 1000), crs = 4326)
   bbox <- st_bbox(bbox_poly)
   bbox <- c(left = as.double(bbox[1]), 
             bottom = as.double(bbox[2]), 
@@ -185,7 +189,7 @@ for(municipality in municipality_focus) {
                shape = 23,
                size = 3) +
     scale_fill_manual(values = injury_severity$color, name = "Crash Severity") +
-    geom_sf(data = municipality_geom %>% filter(MCD_NAME == municipality),
+    geom_sf(data = municipality_filtered,
             inherit.aes = FALSE,
             color = 'black',
             fill = NA,
