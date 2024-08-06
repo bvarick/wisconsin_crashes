@@ -47,13 +47,13 @@ counties <- data.frame(name = c("Dane", "Milwaukee"),
                        CNTYCODE = c(13, 40),
                        COUNTY = c("DANE", "MILWAUKEE"))
 
-# Injury Severy Index and Color -------------------------------------------
+# Injury Severity Index and Color -------------------------------------------
 # injury severity index
 injury_severity <- data.frame(InjSevName = c("Injury severity unknown", "No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
                               code = c(NA, "O", "C", "B", "A", "K"),
                               color = c("grey", "#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
 
-injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = injury_severity$InjSevName)
+#injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = injury_severity$InjSevName)
 
 TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR1 == code)) %>% 
   mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
@@ -147,8 +147,8 @@ school_symbol <- image_read_svg(path = "other/school_FILL0_wght400_GRAD0_opsz24.
 #county_focus <- c("DANE")
 county_focus <- c("DANE")
 
-#school_type_focus <- unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus)) %>% pull(SCHOOLTYPE))
-school_type_focus <- c("Elementary School")
+school_type_focus <- unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus)) %>% pull(SCHOOLTYPE))
+#school_type_focus <- c("High School")
 
 #district_focus <- unique(WI_schools %>%   filter(CTY_DIST %in% str_to_title(county_focus),  SCHOOLTYPE %in% school_type_focus, !is.na(DISTRICT_NAME)) %>%  pull(DISTRICT_NAME))
 district_focus <- c("Madison Metropolitan")
@@ -319,8 +319,8 @@ for(district in district_focus) {
     # generate map
     ggmap(basemap) +
       labs(title = paste0(
-#        "Crashes between cars and youth (<18) pedestrians/bicyclists near ",
-        "Crashes between cars and all pedestrians/bicyclists near ",
+        "Crashes between cars and youth (<18) pedestrians/bicyclists near ",
+#        "Crashes between cars and all pedestrians/bicyclists near ",
         school_data %>% pull(SCHOOL_NAME),
         " School"),
            subtitle = paste0(school_data %>% pull(DISTRICT_NAME),
@@ -339,18 +339,18 @@ for(district in district_focus) {
             plot.caption = element_text(color = "grey")) +
       
       ## add bike lts
-      geom_sf(data = bike_lts[[county]],
-             inherit.aes = FALSE,
-             aes(color = lts)) +
-      scale_color_manual(values = bike_lts_scale$color, name = "Bike Level of Traffic Stress") +
+#      geom_sf(data = bike_lts[[county]],
+#             inherit.aes = FALSE,
+#             aes(color = lts)) +
+#      scale_color_manual(values = bike_lts_scale$color, name = "Bike Level of Traffic Stress") +
       
       # add crash locations
       new_scale_fill() +
       geom_point(data = TOPS_data %>%
                    filter(ROLE1 %in% c("BIKE", "PED") 
-#                          & age1 < 18 
+                          & age1 < 18 
                           | ROLE2 %in% c("BIKE", "PED") 
-#                          & age2 < 18
+                          & age2 < 18
                           ) %>%
                    filter(longitude >= as.double(bbox[1]),
                           latitude >= as.double(bbox[2]),
@@ -361,7 +361,7 @@ for(district in district_focus) {
                      fill = ped_inj_name),
                  shape = 23,
                  size = 3) +
-      scale_fill_manual(values = injury_severity_pal(injury_severity$color), name = "Crash Severity") +
+      scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = "Crash Severity") +
       # add walk boundary
       new_scale_color() +
       new_scale_fill() +
@@ -401,9 +401,10 @@ for(district in district_focus) {
                          str_replace_all(school_data %>% pull(SCHOOLTYPE), "/","-"), 
                          "s/",
                          str_replace_all(school_data %>% pull(SCHOOL_NAME), "/", "-"), 
-                         " School.pdf"),
-           #title = paste0(school_data %>% pull(SCHOOL), " Youth Pedestrian/Bike crashes"),
-           title = paste0(school_data %>% pull(SCHOOL), " All Pedestrian/Bike crashes"),
+                        # " School_all.pdf"),
+                        " School.pdf"),
+           title = paste0(school_data %>% pull(SCHOOL), " Youth Pedestrian/Bike crashes"),
+           #title = paste0(school_data %>% pull(SCHOOL), " All Pedestrian/Bike crashes"),
            device = pdf,
            height = 8.5,
            width = 11,
