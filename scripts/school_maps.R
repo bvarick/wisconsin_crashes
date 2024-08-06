@@ -53,6 +53,8 @@ injury_severity <- data.frame(InjSevName = c("Injury severity unknown", "No appa
                               code = c(NA, "O", "C", "B", "A", "K"),
                               color = c("grey", "#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
 
+injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = injury_severity$InjSevName)
+
 TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR1 == code)) %>% 
   mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
   rename(InjSevName1 = InjSevName)
@@ -146,10 +148,10 @@ school_symbol <- image_read_svg(path = "other/school_FILL0_wght400_GRAD0_opsz24.
 county_focus <- c("DANE")
 
 #school_type_focus <- unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus)) %>% pull(SCHOOLTYPE))
-school_type_focus <- c("High School")
+school_type_focus <- c("Elementary School")
 
 #district_focus <- unique(WI_schools %>%   filter(CTY_DIST %in% str_to_title(county_focus),  SCHOOLTYPE %in% school_type_focus, !is.na(DISTRICT_NAME)) %>%  pull(DISTRICT_NAME))
-district_focus <- c("Monona Grove")
+district_focus <- c("Madison Metropolitan")
 
 school_number <- length(unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus),  
                                               SCHOOLTYPE %in% school_type_focus, 
@@ -359,7 +361,7 @@ for(district in district_focus) {
                      fill = ped_inj_name),
                  shape = 23,
                  size = 3) +
-      scale_fill_manual(values = injury_severity$color, name = "Crash Severity") +
+      scale_fill_manual(values = injury_severity_pal(injury_severity$color), name = "Crash Severity") +
       # add walk boundary
       new_scale_color() +
       new_scale_fill() +

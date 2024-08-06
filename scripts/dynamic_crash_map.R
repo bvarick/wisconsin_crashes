@@ -178,6 +178,30 @@ Census_Crash_geom <- st_join(tract_data,
 
 census_pal <- colorNumeric(palette = "YlOrRd", domain = c(min(Census_Crash_geom$CrashesPerPopulation, na.rm = TRUE), 3000))
 
+# ---- Municipality data
+
+city_data <- st_transform(get_decennial(
+  geography = "place", 
+  variables = "P1_001N", # Total population variable for 2020 census
+  state = state, 
+  year = census_year, 
+  geometry = TRUE
+),
+crs = 4326)
+
+Place_Crash_geom <- st_join(city_data, 
+                             st_as_sf(Pedestrian_Crash_Data %>% filter(PedestrianInjurySeverity %in% c("Fatality", "Suspected Serious Injury", "Suspected Minor Injury"),
+                                                                       latitude > 0), 
+                                      coords = c("longitude", "latitude"), 
+                                      crs = 4326), 
+                             join = st_contains) %>%
+  group_by(GEOID, value, NAME) %>%
+  summarize(crash_count = n()) %>%
+  filter(value > 500) %>%
+  mutate(CrashesPerPopulation = crash_count/(value/100000))
+
+place_pal <- colorNumeric(palette = "YlOrRd", domain = c(min(Place_Crash_geom$CrashesPerPopulation, na.rm = TRUE), max(Place_Crash_geom$CrashesPerPopulation, na.rm = TRUE)))
+
 
 #---- make map
 
@@ -247,9 +271,21 @@ wisconsin_crash_map <-
                                     "average crashes/year per 100k residents: ", round(County_Crash_geom$CrashesPerPopulation,0)), htmltools::HTML),
               group = "Counties") %>%
   addLegend(position = "bottomleft", pal = county_pal, values = County_Crash_geom$CrashesPerPopulation, group = "Counties", title = "Crashes/year</br>(normalized per 100k residents)") %>%
+#  addPolygons(data = Place_Crash_geom,
+#              color = "black",
+#              weight = 1,
+#              fillColor=place_pal(Place_Crash_geom$CrashesPerPopulation),
+#              fillOpacity = 0.6,
+#              label = lapply(paste0("<b>", str_to_title(Place_Crash_geom$NAME), "</b></br>",
+#                                    "population: ", format(Place_Crash_geom$value, nsmall=0, big.mark=","), "<br>",
+#                                    "average crashes per year: ", round(Place_Crash_geom$crash_count,0), "</br>",
+#                                    "average crashes/year per 100k residents: ", round(Place_Crash_geom$CrashesPerPopulation,0)), htmltools::HTML),
+#              group = "Places") %>%
+#  addLegend(position = "bottomleft", pal = place_pal, values = Place_Crash_geom$CrashesPerPopulation, group = "Places", title = "Crashes/year</br>(normalized per 100k residents)") %>%
   groupOptions(group = "Schools", zoomLevels = 13:20) %>%
   groupOptions(group = "Crash Points", zoomLevels = 10:20) %>%
   groupOptions(group ="Counties", zoomLevels = 1:9)
+#  groupOptions(group = "Places", zoomLevels = 10:12)
 
 wisconsin_crash_map
 
