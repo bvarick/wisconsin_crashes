@@ -117,12 +117,12 @@ school_symbol <- image_read_svg(path = "other/school_FILL0_wght400_GRAD0_opsz24.
 
 #county_focus <- str_to_upper(unique(WI_schools %>% pull(CTY_DIST)))
 #county_focus <- c("DANE")
-county_focus <- "Dane"
+county_focus <- "Rock"
 
 municipality_geom <- st_read("data/WI_Cities,_Towns_and_Villages_January_2024.geojson")
-#municipality_focus <- c("Mcfarland")
+municipality_focus <- c("Evansville")
 #municipality_focus <- c("Monona", "Fitchburg")
-municipality_focus <- municipality_geom %>% filter(CNTY_NAME == county_focus) %>% pull(MCD_NAME)
+#municipality_focus <- municipality_geom %>% filter(CNTY_NAME == county_focus) %>% pull(MCD_NAME)
 
 for(municipality in municipality_focus) {
   
@@ -150,7 +150,7 @@ for(municipality in municipality_focus) {
   ggmap(basemap) +
     labs(title = paste0(
       #        "Crashes between cars and youth (<18) pedestrians/bicyclists near ",
-      "Crashes between cars and all pedestrians/bicyclists in/near ",
+      "Crashes between cars and pedestrians & bicyclists in ",
       municipality),
       subtitle = paste0(min(year(TOPS_data$date), na.rm = TRUE), 
                         " - ", 
@@ -188,7 +188,7 @@ for(municipality in municipality_focus) {
                    fill = ped_inj_name),
                shape = 23,
                size = 3) +
-    scale_fill_manual(values = injury_severity$color, name = "Crash Severity") +
+    scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = "Crash Severity") +
     geom_sf(data = municipality_filtered,
             inherit.aes = FALSE,
             color = 'black',
@@ -199,7 +199,7 @@ for(municipality in municipality_focus) {
                       ymin = bbox['top'] - (bbox['top']-bbox['bottom']) * 0.16,
                       ymax = bbox['top'],
                       xmin = bbox['right'] + (bbox['right']-bbox['left']) * 0.05,
-                      xmax = bbox['right'] + (bbox['right']-bbox['left']) * 0.20) +
+                      xmax = bbox['right'] + (bbox['right']-bbox['left']) * 0.15) +
     coord_sf(clip = "off")
   
   ggsave(file = paste0("figures/municipalities/",
