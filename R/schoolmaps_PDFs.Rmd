@@ -431,11 +431,13 @@ for(school in WI_schools$district_school) {
   double_check[[school]] <- school_check
 }
 double_check <- bind_rows(double_check)
-unique(WI_schools %>% 
+write_csv(double_check, file = "parameters/double_check.csv")
+
+districts_not_done <- data.frame(districts = c(unique(WI_schools %>% 
          filter(district_school %in% (double_check %>% 
                                         filter(exists == FALSE) %>% 
                                         pull(district_school)),
                 !st_is_empty(SHAPE)) %>% 
-         pull(DISTRICT_NAME))
-write_csv(double_check, file = "parameters/double_check.csv")
+         pull(DISTRICT_NAME))))
+write_csv(districts_not_done, file = "parameters/districts_not_done.csv")
 ```
