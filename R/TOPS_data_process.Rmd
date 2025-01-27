@@ -1,0 +1,105 @@
+---
+title: "TOPS data process"
+output:
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+editor_options:
+  chunk_output_type: console
+---
+
+
+# Input Data & Configuration
+
+## Libraries
+```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+date()
+rm(list=ls())
+library(tidyverse)
+```
+
+## Compile TOPS data from multiple years
+```{r topsdata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+## add data from WiscTransPortal Crash Data Retrieval Facility ----
+## query:  SELECT * 
+## FROM DTCRPRD.SUMMARY_COMBINED C 
+## WHERE C.CRSHDATE BETWEEN TO_DATE('2022-JAN','YYYY-MM') AND 
+## LAST_DAY(TO_DATE('2022-DEC','YYYY-MM')) AND 
+## (C.BIKEFLAG = 'Y' OR C.PEDFLAG = 'Y') 
+## ORDER BY C.DOCTNMBR
+
+## Load TOPS data ----
+## load TOPS data for the whole state (crashes involving bikes and pedestrians),
+TOPS_data <- as.list(NULL)
+for (file in list.files(path = "data/TOPS/", pattern = "crash-data-download")) {
+  message(paste("importing data from file: ", file))
+  year <- substr(file, 21, 24)
+  csv_run <- read_csv(file = paste0("data/TOPS/",file), col_types = cols(.default = "c"))
+  csv_run["retreive_date"] <- file.info(file = paste0("data/TOPS/",file))$mtime
+  TOPS_data[[file]] <- csv_run
+}
+rm(csv_run, file, year)
+TOPS_data <- bind_rows(TOPS_data)
+```
+
+## Clean up data
+```{r cleandata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+TOPS_data <- TOPS_data %>% 
+  mutate(date = ymd(CRSHDATE), 
+         age1 = as.double(AGE1),
+         age2 = as.double(AGE2),
+         latitude  = as.double(LATDECDG),
+         longitude = as.double(LONDECDG)) %>% 
+  mutate(month = month(date, label = TRUE),
+         year = as.factor(year(date)))
+
+retrieve_date <- max(TOPS_data %>% filter(year %in% max(year(TOPS_data$date), na.rm = TRUE)) %>% pull(retreive_date))
+```
+
+## Add injury severity index and assign bike/ped roles
+```{r injuryseverity, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+# Injury Severity Index and Color -------------------------------------------
+# injury severity index
+injury_severity <- data.frame(InjSevName = c("Injury severity unknown", "No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
+                              code = c(NA, "O", "C", "B", "A", "K"),
+                              color = c("grey", "#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
+
+#injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = injury_severity$InjSevName)
+
+TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR1 == code)) %>% 
+  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
+  rename(InjSevName1 = InjSevName)
+TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR2 == code)) %>% 
+  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
+  rename(InjSevName2 = InjSevName)
+# add bike or pedestrian roles ----
+
+bike_roles <- c("BIKE", "O BIKE")
+ped_roles <- c("PED", "O PED", "PED NO")
+vuln_roles <- c(bike_roles, ped_roles)
+
+TOPS_data <- TOPS_data %>% mutate(ped_inj = ifelse(ROLE1 %in% vuln_roles, 
+                                                   INJSVR1, 
+                                                   ifelse(ROLE2 %in% vuln_roles, 
+                                                          INJSVR2,
+                                                          NA)))
+
+TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(ped_inj == code)) %>% 
+  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
+  rename(ped_inj_name = InjSevName)
+
+# bike or ped
+TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% bike_roles | ROLE2 %in% bike_roles, 
+                                                           "Bicyclist", 
+                                                           ifelse(ROLE1 %in% ped_roles | ROLE2 %in% ped_roles, 
+                                                                  "Pedestrian",
+                                                                  NA)))
+```
+
+## Save resulting data table as an Rda file for use in other documents
+```{r savecleaneddata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+save(TOPS_data, file = "data/TOPS/TOPS_data.Rda")
+```
