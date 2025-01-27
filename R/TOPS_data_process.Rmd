@@ -102,4 +102,7 @@ TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% bike_roles
 ## Save resulting data table as an Rda file for use in other documents
 ```{r savecleaneddata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 save(TOPS_data, file = "data/TOPS/TOPS_data.Rda")
+save(vuln_roles, file = "data/TOPS/vuln_roles.Rda")
+save(retrieve_date, file = "data/TOPS/retrieve_date.Rda")
+save(injury_severity, file = "data/TOPS/injury_severity.Rda")
 ```
