@@ -249,7 +249,7 @@ options(osrm.profile = "walk")
 ```
 
 ## Function to generate maps
-```{r schoolmaps, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+```{r schoolmaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = NA}
 generate_school_maps <- function(district) {
   
   message(paste("***", district, "School District |"))
@@ -398,7 +398,7 @@ generate_school_maps <- function(district) {
 ```
 
 ## Generate the school maps
-```{r generatemaps, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+```{r generatemaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = NA}
 i <- 0
 if (run_parameters$parallel) {
   mclapply(district_focus,
