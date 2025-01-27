@@ -1,9 +1,3 @@
-data/TOPS/*
-basemaps/*
-figures/school_maps/*
-figures/municipalities/*
-api_keys/*
-basemaps/*
 .Rproj.user
 .Rhistory
-other/districts_done.csv
+districts_done.csv
