@@ -1,27 +1,30 @@
-CNTYNAME,year,ped_type,ped_inj,count
-MILWAUKEE,2017,BIKE,Fatality,2
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,15
-MILWAUKEE,2017,PED,Fatality,19
-MILWAUKEE,2017,PED,Suspected Serious Injury,80
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,13
-MILWAUKEE,2018,PED,Fatality,19
-MILWAUKEE,2018,PED,Suspected Serious Injury,93
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,19
-MILWAUKEE,2019,PED,Fatality,15
-MILWAUKEE,2019,PED,Suspected Serious Injury,91
-MILWAUKEE,2020,BIKE,Fatality,3
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,11
-MILWAUKEE,2020,PED,Fatality,14
-MILWAUKEE,2020,PED,Suspected Serious Injury,75
-MILWAUKEE,2021,BIKE,Fatality,2
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,22
-MILWAUKEE,2021,PED,Fatality,21
-MILWAUKEE,2021,PED,Suspected Serious Injury,93
-MILWAUKEE,2022,BIKE,Fatality,7
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,16
-MILWAUKEE,2022,PED,Fatality,28
-MILWAUKEE,2022,PED,Suspected Serious Injury,68
-MILWAUKEE,2023,BIKE,Fatality,1
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,14
-MILWAUKEE,2023,PED,Fatality,22
-MILWAUKEE,2023,PED,Suspected Serious Injury,86
+CNTYNAME,year,vulnerable_role,ped_inj_name,count
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,15
+MILWAUKEE,2017,Bicyclist,Fatality,2
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,81
+MILWAUKEE,2017,Pedestrian,Fatality,19
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,13
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,93
+MILWAUKEE,2018,Pedestrian,Fatality,19
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,19
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,91
+MILWAUKEE,2019,Pedestrian,Fatality,16
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,11
+MILWAUKEE,2020,Bicyclist,Fatality,3
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,75
+MILWAUKEE,2020,Pedestrian,Fatality,14
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,22
+MILWAUKEE,2021,Bicyclist,Fatality,2
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,93
+MILWAUKEE,2021,Pedestrian,Fatality,21
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,16
+MILWAUKEE,2022,Bicyclist,Fatality,7
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,68
+MILWAUKEE,2022,Pedestrian,Fatality,28
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,14
+MILWAUKEE,2023,Bicyclist,Fatality,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,88
+MILWAUKEE,2023,Pedestrian,Fatality,24
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,15
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,80
+MILWAUKEE,2024,Pedestrian,Fatality,19

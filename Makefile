@@ -12,6 +12,9 @@ crashmaps_dynamic: R/dynamic_crash_map.Rmd
 crashmaps_dynamic_milwaukee: R/dynamic_crash_map_milwaukee.Rmd
 	R -e 'library("rmarkdown"); old_path <- Sys.getenv("PATH"); Sys.setenv(PATH = paste(old_path, "/usr/local/bin", sep = ":")); rmarkdown::render(knit_root_dir = "../", output_dir = "./html", input = "./R/dynamic_crash_map_milwaukee.Rmd", output_file = "./html/dynamic_crash_map_milwaukee.html")'
 
+crash_data_summaries: R/crash_data_summaries.Rmd
+	R -e 'library("rmarkdown"); old_path <- Sys.getenv("PATH"); Sys.setenv(PATH = paste(old_path, "/usr/local/bin", sep = ":")); rmarkdown::render(knit_root_dir = "../", output_dir = "./html", input = "./R/crash_data_summaries.Rmd", output_file = "./html/crash_data_summaries.html")'
+
 osrm-data:
 	cd ./docker/osrm/; wget https://download.geofabrik.de/north-america/us/wisconsin-latest.osm.pbf -O ./data-raw/wisconsin-latest.osm.pbf
 	cd ./docker/osrm/; docker run --rm -t -v "./data-foot:/data" -v "./data-raw/wisconsin-latest.osm.pbf:/data/wisconsin-latest.osm.pbf" osrm/osrm-backend osrm-extract -p /opt/foot.lua /data/wisconsin-latest.osm.pbf

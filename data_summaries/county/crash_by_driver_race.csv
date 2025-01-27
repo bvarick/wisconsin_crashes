@@ -1,99 +1,112 @@
-CNTYNAME,year,ped_type,ped_inj,driver_race,count
-MILWAUKEE,2017,BIKE,Fatality,Black,1
-MILWAUKEE,2017,BIKE,Fatality,NA,1
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,Black,9
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,White,5
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,NA,1
-MILWAUKEE,2017,PED,Fatality,Asian,1
-MILWAUKEE,2017,PED,Fatality,Black,6
-MILWAUKEE,2017,PED,Fatality,Hispanic,2
-MILWAUKEE,2017,PED,Fatality,White,7
-MILWAUKEE,2017,PED,Fatality,NA,3
-MILWAUKEE,2017,PED,Suspected Serious Injury,Black,23
-MILWAUKEE,2017,PED,Suspected Serious Injury,Hispanic,3
-MILWAUKEE,2017,PED,Suspected Serious Injury,White,22
-MILWAUKEE,2017,PED,Suspected Serious Injury,NA,32
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,Black,4
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,White,6
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,NA,3
-MILWAUKEE,2018,PED,Fatality,Black,8
-MILWAUKEE,2018,PED,Fatality,White,5
-MILWAUKEE,2018,PED,Fatality,NA,6
-MILWAUKEE,2018,PED,Suspected Serious Injury,Asian,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,Black,28
-MILWAUKEE,2018,PED,Suspected Serious Injury,Hispanic,5
-MILWAUKEE,2018,PED,Suspected Serious Injury,Indian,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,White,31
-MILWAUKEE,2018,PED,Suspected Serious Injury,NA,26
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,Asian,1
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,Black,4
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,Hispanic,2
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,White,9
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,NA,3
-MILWAUKEE,2019,PED,Fatality,Black,6
-MILWAUKEE,2019,PED,Fatality,Hispanic,4
-MILWAUKEE,2019,PED,Fatality,White,4
-MILWAUKEE,2019,PED,Fatality,NA,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,Asian,4
-MILWAUKEE,2019,PED,Suspected Serious Injury,Black,31
-MILWAUKEE,2019,PED,Suspected Serious Injury,Hispanic,5
-MILWAUKEE,2019,PED,Suspected Serious Injury,White,29
-MILWAUKEE,2019,PED,Suspected Serious Injury,NA,22
-MILWAUKEE,2020,BIKE,Fatality,Black,3
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,Asian,1
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,Black,2
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,Hispanic,2
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,White,5
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,NA,1
-MILWAUKEE,2020,PED,Fatality,Black,7
-MILWAUKEE,2020,PED,Fatality,Hispanic,2
-MILWAUKEE,2020,PED,Fatality,White,4
-MILWAUKEE,2020,PED,Fatality,NA,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,Black,25
-MILWAUKEE,2020,PED,Suspected Serious Injury,Hispanic,2
-MILWAUKEE,2020,PED,Suspected Serious Injury,White,15
-MILWAUKEE,2020,PED,Suspected Serious Injury,NA,33
-MILWAUKEE,2021,BIKE,Fatality,Black,1
-MILWAUKEE,2021,BIKE,Fatality,NA,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,Black,3
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,Hispanic,2
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,Indian,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,White,10
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,NA,6
-MILWAUKEE,2021,PED,Fatality,Black,8
-MILWAUKEE,2021,PED,Fatality,White,6
-MILWAUKEE,2021,PED,Fatality,NA,7
-MILWAUKEE,2021,PED,Suspected Serious Injury,Black,32
-MILWAUKEE,2021,PED,Suspected Serious Injury,Hispanic,3
-MILWAUKEE,2021,PED,Suspected Serious Injury,Indian,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,White,21
-MILWAUKEE,2021,PED,Suspected Serious Injury,NA,36
-MILWAUKEE,2022,BIKE,Fatality,Black,3
-MILWAUKEE,2022,BIKE,Fatality,Hispanic,1
-MILWAUKEE,2022,BIKE,Fatality,White,2
-MILWAUKEE,2022,BIKE,Fatality,NA,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,Black,2
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,Hispanic,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,White,7
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,NA,6
-MILWAUKEE,2022,PED,Fatality,Black,6
-MILWAUKEE,2022,PED,Fatality,Hispanic,4
-MILWAUKEE,2022,PED,Fatality,White,6
-MILWAUKEE,2022,PED,Fatality,NA,12
-MILWAUKEE,2022,PED,Suspected Serious Injury,Asian,2
-MILWAUKEE,2022,PED,Suspected Serious Injury,Black,17
-MILWAUKEE,2022,PED,Suspected Serious Injury,Hispanic,5
-MILWAUKEE,2022,PED,Suspected Serious Injury,White,21
-MILWAUKEE,2022,PED,Suspected Serious Injury,NA,23
-MILWAUKEE,2023,BIKE,Fatality,Black,1
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,Black,4
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,White,7
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,NA,3
-MILWAUKEE,2023,PED,Fatality,Black,7
-MILWAUKEE,2023,PED,Fatality,Hispanic,2
-MILWAUKEE,2023,PED,Fatality,White,5
-MILWAUKEE,2023,PED,Fatality,NA,8
-MILWAUKEE,2023,PED,Suspected Serious Injury,Black,27
-MILWAUKEE,2023,PED,Suspected Serious Injury,Hispanic,2
-MILWAUKEE,2023,PED,Suspected Serious Injury,White,19
-MILWAUKEE,2023,PED,Suspected Serious Injury,NA,38
+CNTYNAME,year,vulnerable_role,ped_inj_name,driver_race,count
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,Black,9
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,White,5
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,NA,1
+MILWAUKEE,2017,Bicyclist,Fatality,Black,1
+MILWAUKEE,2017,Bicyclist,Fatality,NA,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,Black,24
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,Hispanic,3
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,White,22
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,NA,32
+MILWAUKEE,2017,Pedestrian,Fatality,Asian,1
+MILWAUKEE,2017,Pedestrian,Fatality,Black,6
+MILWAUKEE,2017,Pedestrian,Fatality,Hispanic,2
+MILWAUKEE,2017,Pedestrian,Fatality,White,7
+MILWAUKEE,2017,Pedestrian,Fatality,NA,3
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,Black,4
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,White,6
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,NA,3
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,Asian,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,Black,28
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,Hispanic,5
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,Indian,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,White,31
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,NA,26
+MILWAUKEE,2018,Pedestrian,Fatality,Black,8
+MILWAUKEE,2018,Pedestrian,Fatality,White,5
+MILWAUKEE,2018,Pedestrian,Fatality,NA,6
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,Asian,1
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,Black,4
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,Hispanic,2
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,White,9
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,NA,3
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,Asian,4
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,Black,31
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,Hispanic,5
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,White,29
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,NA,22
+MILWAUKEE,2019,Pedestrian,Fatality,Black,7
+MILWAUKEE,2019,Pedestrian,Fatality,Hispanic,4
+MILWAUKEE,2019,Pedestrian,Fatality,White,4
+MILWAUKEE,2019,Pedestrian,Fatality,NA,1
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,Asian,1
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,Black,2
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,Hispanic,2
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,White,5
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,NA,1
+MILWAUKEE,2020,Bicyclist,Fatality,Black,3
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,Black,25
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,Hispanic,2
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,White,15
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,NA,33
+MILWAUKEE,2020,Pedestrian,Fatality,Black,7
+MILWAUKEE,2020,Pedestrian,Fatality,Hispanic,2
+MILWAUKEE,2020,Pedestrian,Fatality,White,4
+MILWAUKEE,2020,Pedestrian,Fatality,NA,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,Black,3
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,Hispanic,2
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,Indian,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,White,10
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,NA,6
+MILWAUKEE,2021,Bicyclist,Fatality,Black,1
+MILWAUKEE,2021,Bicyclist,Fatality,NA,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,Black,32
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,Hispanic,3
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,Indian,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,White,21
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,NA,36
+MILWAUKEE,2021,Pedestrian,Fatality,Black,8
+MILWAUKEE,2021,Pedestrian,Fatality,White,6
+MILWAUKEE,2021,Pedestrian,Fatality,NA,7
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,Black,2
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,Hispanic,1
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,White,7
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,NA,6
+MILWAUKEE,2022,Bicyclist,Fatality,Black,3
+MILWAUKEE,2022,Bicyclist,Fatality,Hispanic,1
+MILWAUKEE,2022,Bicyclist,Fatality,White,2
+MILWAUKEE,2022,Bicyclist,Fatality,NA,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,Asian,2
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,Black,17
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,Hispanic,5
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,White,21
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,NA,23
+MILWAUKEE,2022,Pedestrian,Fatality,Black,6
+MILWAUKEE,2022,Pedestrian,Fatality,Hispanic,4
+MILWAUKEE,2022,Pedestrian,Fatality,White,6
+MILWAUKEE,2022,Pedestrian,Fatality,NA,12
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,Black,4
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,White,7
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,NA,3
+MILWAUKEE,2023,Bicyclist,Fatality,Black,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,Black,29
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,Hispanic,2
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,White,19
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,NA,38
+MILWAUKEE,2023,Pedestrian,Fatality,Black,7
+MILWAUKEE,2023,Pedestrian,Fatality,Hispanic,3
+MILWAUKEE,2023,Pedestrian,Fatality,White,5
+MILWAUKEE,2023,Pedestrian,Fatality,NA,9
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,Asian,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,Black,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,Hispanic,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,White,8
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,NA,4
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,Black,26
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,Hispanic,7
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,White,21
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,NA,26
+MILWAUKEE,2024,Pedestrian,Fatality,Black,10
+MILWAUKEE,2024,Pedestrian,Fatality,Hispanic,2
+MILWAUKEE,2024,Pedestrian,Fatality,White,3
+MILWAUKEE,2024,Pedestrian,Fatality,NA,4

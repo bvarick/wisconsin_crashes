@@ -1,423 +1,511 @@
-CNTYNAME,year,ped_type,ped_inj,driver_age,count
-MILWAUKEE,2017,BIKE,Fatality,26,1
-MILWAUKEE,2017,BIKE,Fatality,NA,1
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,20,1
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,28,1
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,33,1
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,37,1
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,40,1
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,45,1
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,46,1
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,57,1
-MILWAUKEE,2017,BIKE,Suspected Serious Injury,NA,7
-MILWAUKEE,2017,PED,Fatality,20,1
-MILWAUKEE,2017,PED,Fatality,21,1
-MILWAUKEE,2017,PED,Fatality,26,2
-MILWAUKEE,2017,PED,Fatality,28,1
-MILWAUKEE,2017,PED,Fatality,31,1
-MILWAUKEE,2017,PED,Fatality,33,1
-MILWAUKEE,2017,PED,Fatality,35,2
-MILWAUKEE,2017,PED,Fatality,41,1
-MILWAUKEE,2017,PED,Fatality,56,1
-MILWAUKEE,2017,PED,Fatality,60,1
-MILWAUKEE,2017,PED,Fatality,66,1
-MILWAUKEE,2017,PED,Fatality,68,1
-MILWAUKEE,2017,PED,Fatality,72,2
-MILWAUKEE,2017,PED,Fatality,NA,3
-MILWAUKEE,2017,PED,Suspected Serious Injury,15,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,16,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,19,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,20,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,21,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,22,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,23,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,24,3
-MILWAUKEE,2017,PED,Suspected Serious Injury,25,2
-MILWAUKEE,2017,PED,Suspected Serious Injury,26,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,27,2
-MILWAUKEE,2017,PED,Suspected Serious Injury,29,2
-MILWAUKEE,2017,PED,Suspected Serious Injury,30,3
-MILWAUKEE,2017,PED,Suspected Serious Injury,31,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,34,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,35,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,36,3
-MILWAUKEE,2017,PED,Suspected Serious Injury,39,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,40,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,41,2
-MILWAUKEE,2017,PED,Suspected Serious Injury,42,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,44,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,47,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,48,2
-MILWAUKEE,2017,PED,Suspected Serious Injury,49,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,51,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,52,2
-MILWAUKEE,2017,PED,Suspected Serious Injury,55,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,58,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,65,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,70,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,72,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,75,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,77,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,80,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,87,1
-MILWAUKEE,2017,PED,Suspected Serious Injury,NA,32
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,26,3
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,34,1
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,54,1
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,58,1
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,61,1
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,71,1
-MILWAUKEE,2018,BIKE,Suspected Serious Injury,NA,5
-MILWAUKEE,2018,PED,Fatality,20,1
-MILWAUKEE,2018,PED,Fatality,25,2
-MILWAUKEE,2018,PED,Fatality,34,1
-MILWAUKEE,2018,PED,Fatality,41,1
-MILWAUKEE,2018,PED,Fatality,46,1
-MILWAUKEE,2018,PED,Fatality,48,1
-MILWAUKEE,2018,PED,Fatality,50,1
-MILWAUKEE,2018,PED,Fatality,57,1
-MILWAUKEE,2018,PED,Fatality,58,1
-MILWAUKEE,2018,PED,Fatality,63,1
-MILWAUKEE,2018,PED,Fatality,67,1
-MILWAUKEE,2018,PED,Fatality,73,1
-MILWAUKEE,2018,PED,Fatality,NA,6
-MILWAUKEE,2018,PED,Suspected Serious Injury,16,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,18,3
-MILWAUKEE,2018,PED,Suspected Serious Injury,19,4
-MILWAUKEE,2018,PED,Suspected Serious Injury,20,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,21,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,22,3
-MILWAUKEE,2018,PED,Suspected Serious Injury,23,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,24,3
-MILWAUKEE,2018,PED,Suspected Serious Injury,26,4
-MILWAUKEE,2018,PED,Suspected Serious Injury,27,3
-MILWAUKEE,2018,PED,Suspected Serious Injury,29,3
-MILWAUKEE,2018,PED,Suspected Serious Injury,30,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,32,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,33,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,34,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,35,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,36,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,38,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,40,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,41,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,42,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,43,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,44,4
-MILWAUKEE,2018,PED,Suspected Serious Injury,46,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,47,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,48,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,49,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,50,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,53,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,54,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,58,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,59,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,61,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,62,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,63,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,64,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,65,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,72,2
-MILWAUKEE,2018,PED,Suspected Serious Injury,88,1
-MILWAUKEE,2018,PED,Suspected Serious Injury,NA,25
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,21,1
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,23,1
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,28,1
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,33,2
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,41,1
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,48,1
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,49,1
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,50,1
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,53,2
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,59,2
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,81,1
-MILWAUKEE,2019,BIKE,Suspected Serious Injury,NA,5
-MILWAUKEE,2019,PED,Fatality,18,1
-MILWAUKEE,2019,PED,Fatality,19,1
-MILWAUKEE,2019,PED,Fatality,21,2
-MILWAUKEE,2019,PED,Fatality,22,1
-MILWAUKEE,2019,PED,Fatality,26,1
-MILWAUKEE,2019,PED,Fatality,27,1
-MILWAUKEE,2019,PED,Fatality,30,1
-MILWAUKEE,2019,PED,Fatality,31,1
-MILWAUKEE,2019,PED,Fatality,33,1
-MILWAUKEE,2019,PED,Fatality,43,1
-MILWAUKEE,2019,PED,Fatality,48,1
-MILWAUKEE,2019,PED,Fatality,50,1
-MILWAUKEE,2019,PED,Fatality,53,1
-MILWAUKEE,2019,PED,Fatality,NA,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,8,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,16,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,17,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,18,4
-MILWAUKEE,2019,PED,Suspected Serious Injury,19,4
-MILWAUKEE,2019,PED,Suspected Serious Injury,20,2
-MILWAUKEE,2019,PED,Suspected Serious Injury,23,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,24,2
-MILWAUKEE,2019,PED,Suspected Serious Injury,25,2
-MILWAUKEE,2019,PED,Suspected Serious Injury,26,2
-MILWAUKEE,2019,PED,Suspected Serious Injury,27,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,28,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,29,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,30,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,31,2
-MILWAUKEE,2019,PED,Suspected Serious Injury,33,2
-MILWAUKEE,2019,PED,Suspected Serious Injury,34,3
-MILWAUKEE,2019,PED,Suspected Serious Injury,35,3
-MILWAUKEE,2019,PED,Suspected Serious Injury,36,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,37,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,38,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,40,2
-MILWAUKEE,2019,PED,Suspected Serious Injury,41,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,42,4
-MILWAUKEE,2019,PED,Suspected Serious Injury,43,2
-MILWAUKEE,2019,PED,Suspected Serious Injury,44,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,48,2
-MILWAUKEE,2019,PED,Suspected Serious Injury,51,3
-MILWAUKEE,2019,PED,Suspected Serious Injury,53,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,56,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,57,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,59,3
-MILWAUKEE,2019,PED,Suspected Serious Injury,61,3
-MILWAUKEE,2019,PED,Suspected Serious Injury,63,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,66,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,67,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,69,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,71,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,72,1
-MILWAUKEE,2019,PED,Suspected Serious Injury,NA,24
-MILWAUKEE,2020,BIKE,Fatality,28,1
-MILWAUKEE,2020,BIKE,Fatality,31,1
-MILWAUKEE,2020,BIKE,Fatality,48,1
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,17,1
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,39,1
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,49,1
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,56,1
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,57,1
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,69,1
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,70,1
-MILWAUKEE,2020,BIKE,Suspected Serious Injury,NA,4
-MILWAUKEE,2020,PED,Fatality,15,1
-MILWAUKEE,2020,PED,Fatality,20,1
-MILWAUKEE,2020,PED,Fatality,21,1
-MILWAUKEE,2020,PED,Fatality,23,1
-MILWAUKEE,2020,PED,Fatality,24,1
-MILWAUKEE,2020,PED,Fatality,27,1
-MILWAUKEE,2020,PED,Fatality,30,1
-MILWAUKEE,2020,PED,Fatality,32,1
-MILWAUKEE,2020,PED,Fatality,47,1
-MILWAUKEE,2020,PED,Fatality,48,1
-MILWAUKEE,2020,PED,Fatality,50,1
-MILWAUKEE,2020,PED,Fatality,54,1
-MILWAUKEE,2020,PED,Fatality,60,1
-MILWAUKEE,2020,PED,Fatality,71,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,16,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,19,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,21,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,22,2
-MILWAUKEE,2020,PED,Suspected Serious Injury,23,3
-MILWAUKEE,2020,PED,Suspected Serious Injury,24,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,25,3
-MILWAUKEE,2020,PED,Suspected Serious Injury,26,2
-MILWAUKEE,2020,PED,Suspected Serious Injury,27,3
-MILWAUKEE,2020,PED,Suspected Serious Injury,28,3
-MILWAUKEE,2020,PED,Suspected Serious Injury,31,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,32,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,33,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,34,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,36,2
-MILWAUKEE,2020,PED,Suspected Serious Injury,37,2
-MILWAUKEE,2020,PED,Suspected Serious Injury,39,2
-MILWAUKEE,2020,PED,Suspected Serious Injury,43,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,45,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,46,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,48,2
-MILWAUKEE,2020,PED,Suspected Serious Injury,56,2
-MILWAUKEE,2020,PED,Suspected Serious Injury,60,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,61,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,62,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,63,2
-MILWAUKEE,2020,PED,Suspected Serious Injury,71,1
-MILWAUKEE,2020,PED,Suspected Serious Injury,NA,32
-MILWAUKEE,2021,BIKE,Fatality,20,1
-MILWAUKEE,2021,BIKE,Fatality,56,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,18,2
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,20,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,21,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,22,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,23,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,29,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,40,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,41,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,42,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,57,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,63,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,66,1
-MILWAUKEE,2021,BIKE,Suspected Serious Injury,NA,9
-MILWAUKEE,2021,PED,Fatality,13,1
-MILWAUKEE,2021,PED,Fatality,21,1
-MILWAUKEE,2021,PED,Fatality,22,2
-MILWAUKEE,2021,PED,Fatality,23,1
-MILWAUKEE,2021,PED,Fatality,27,1
-MILWAUKEE,2021,PED,Fatality,30,1
-MILWAUKEE,2021,PED,Fatality,32,1
-MILWAUKEE,2021,PED,Fatality,34,1
-MILWAUKEE,2021,PED,Fatality,37,1
-MILWAUKEE,2021,PED,Fatality,40,1
-MILWAUKEE,2021,PED,Fatality,46,2
-MILWAUKEE,2021,PED,Fatality,51,1
-MILWAUKEE,2021,PED,Fatality,54,1
-MILWAUKEE,2021,PED,Fatality,NA,6
-MILWAUKEE,2021,PED,Suspected Serious Injury,12,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,16,3
-MILWAUKEE,2021,PED,Suspected Serious Injury,18,2
-MILWAUKEE,2021,PED,Suspected Serious Injury,19,2
-MILWAUKEE,2021,PED,Suspected Serious Injury,21,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,22,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,24,5
-MILWAUKEE,2021,PED,Suspected Serious Injury,25,4
-MILWAUKEE,2021,PED,Suspected Serious Injury,26,3
-MILWAUKEE,2021,PED,Suspected Serious Injury,27,3
-MILWAUKEE,2021,PED,Suspected Serious Injury,29,2
-MILWAUKEE,2021,PED,Suspected Serious Injury,30,2
-MILWAUKEE,2021,PED,Suspected Serious Injury,31,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,32,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,37,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,38,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,39,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,42,3
-MILWAUKEE,2021,PED,Suspected Serious Injury,43,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,45,2
-MILWAUKEE,2021,PED,Suspected Serious Injury,51,2
-MILWAUKEE,2021,PED,Suspected Serious Injury,52,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,53,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,54,2
-MILWAUKEE,2021,PED,Suspected Serious Injury,55,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,57,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,58,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,59,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,61,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,65,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,68,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,78,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,83,1
-MILWAUKEE,2021,PED,Suspected Serious Injury,88,2
-MILWAUKEE,2021,PED,Suspected Serious Injury,NA,36
-MILWAUKEE,2022,BIKE,Fatality,33,1
-MILWAUKEE,2022,BIKE,Fatality,42,1
-MILWAUKEE,2022,BIKE,Fatality,64,1
-MILWAUKEE,2022,BIKE,Fatality,66,1
-MILWAUKEE,2022,BIKE,Fatality,NA,3
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,24,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,27,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,30,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,39,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,43,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,57,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,65,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,68,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,72,1
-MILWAUKEE,2022,BIKE,Suspected Serious Injury,NA,7
-MILWAUKEE,2022,PED,Fatality,19,1
-MILWAUKEE,2022,PED,Fatality,23,2
-MILWAUKEE,2022,PED,Fatality,25,2
-MILWAUKEE,2022,PED,Fatality,30,1
-MILWAUKEE,2022,PED,Fatality,34,2
-MILWAUKEE,2022,PED,Fatality,35,1
-MILWAUKEE,2022,PED,Fatality,40,2
-MILWAUKEE,2022,PED,Fatality,45,1
-MILWAUKEE,2022,PED,Fatality,49,1
-MILWAUKEE,2022,PED,Fatality,54,1
-MILWAUKEE,2022,PED,Fatality,74,1
-MILWAUKEE,2022,PED,Fatality,77,1
-MILWAUKEE,2022,PED,Fatality,NA,12
-MILWAUKEE,2022,PED,Suspected Serious Injury,16,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,18,3
-MILWAUKEE,2022,PED,Suspected Serious Injury,19,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,20,2
-MILWAUKEE,2022,PED,Suspected Serious Injury,21,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,22,3
-MILWAUKEE,2022,PED,Suspected Serious Injury,23,2
-MILWAUKEE,2022,PED,Suspected Serious Injury,27,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,28,2
-MILWAUKEE,2022,PED,Suspected Serious Injury,29,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,30,3
-MILWAUKEE,2022,PED,Suspected Serious Injury,31,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,32,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,34,4
-MILWAUKEE,2022,PED,Suspected Serious Injury,35,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,39,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,43,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,45,2
-MILWAUKEE,2022,PED,Suspected Serious Injury,51,2
-MILWAUKEE,2022,PED,Suspected Serious Injury,55,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,57,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,59,2
-MILWAUKEE,2022,PED,Suspected Serious Injury,65,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,67,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,69,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,75,2
-MILWAUKEE,2022,PED,Suspected Serious Injury,77,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,80,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,88,1
-MILWAUKEE,2022,PED,Suspected Serious Injury,NA,23
-MILWAUKEE,2023,BIKE,Fatality,30,1
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,29,1
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,35,1
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,47,1
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,60,1
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,61,1
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,63,1
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,73,1
-MILWAUKEE,2023,BIKE,Suspected Serious Injury,NA,7
-MILWAUKEE,2023,PED,Fatality,20,1
-MILWAUKEE,2023,PED,Fatality,25,1
-MILWAUKEE,2023,PED,Fatality,27,1
-MILWAUKEE,2023,PED,Fatality,36,1
-MILWAUKEE,2023,PED,Fatality,38,1
-MILWAUKEE,2023,PED,Fatality,41,2
-MILWAUKEE,2023,PED,Fatality,42,1
-MILWAUKEE,2023,PED,Fatality,43,1
-MILWAUKEE,2023,PED,Fatality,46,1
-MILWAUKEE,2023,PED,Fatality,49,1
-MILWAUKEE,2023,PED,Fatality,50,1
-MILWAUKEE,2023,PED,Fatality,54,1
-MILWAUKEE,2023,PED,Fatality,56,1
-MILWAUKEE,2023,PED,Fatality,65,1
-MILWAUKEE,2023,PED,Fatality,NA,7
-MILWAUKEE,2023,PED,Suspected Serious Injury,19,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,20,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,21,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,24,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,25,2
-MILWAUKEE,2023,PED,Suspected Serious Injury,26,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,29,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,30,4
-MILWAUKEE,2023,PED,Suspected Serious Injury,31,3
-MILWAUKEE,2023,PED,Suspected Serious Injury,33,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,36,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,38,2
-MILWAUKEE,2023,PED,Suspected Serious Injury,42,2
-MILWAUKEE,2023,PED,Suspected Serious Injury,44,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,46,2
-MILWAUKEE,2023,PED,Suspected Serious Injury,47,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,48,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,50,3
-MILWAUKEE,2023,PED,Suspected Serious Injury,53,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,54,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,56,2
-MILWAUKEE,2023,PED,Suspected Serious Injury,57,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,58,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,61,2
-MILWAUKEE,2023,PED,Suspected Serious Injury,62,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,64,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,65,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,66,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,69,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,71,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,73,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,80,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,81,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,94,1
-MILWAUKEE,2023,PED,Suspected Serious Injury,NA,39
+CNTYNAME,year,vulnerable_role,ped_inj_name,driver_age,count
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,20,1
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,27,1
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,28,2
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,33,1
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,37,1
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,40,2
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,45,1
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,46,1
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,49,1
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,57,1
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,66,1
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,68,1
+MILWAUKEE,2017,Bicyclist,Suspected Serious Injury,NA,1
+MILWAUKEE,2017,Bicyclist,Fatality,26,1
+MILWAUKEE,2017,Bicyclist,Fatality,NA,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,15,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,16,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,19,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,20,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,21,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,22,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,23,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,24,3
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,25,2
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,26,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,27,2
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,29,2
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,30,3
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,31,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,34,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,35,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,36,3
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,39,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,40,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,41,2
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,42,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,44,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,47,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,48,2
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,49,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,51,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,52,2
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,55,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,58,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,60,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,65,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,70,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,72,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,75,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,77,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,80,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,87,1
+MILWAUKEE,2017,Pedestrian,Suspected Serious Injury,NA,32
+MILWAUKEE,2017,Pedestrian,Fatality,20,1
+MILWAUKEE,2017,Pedestrian,Fatality,21,1
+MILWAUKEE,2017,Pedestrian,Fatality,26,2
+MILWAUKEE,2017,Pedestrian,Fatality,28,1
+MILWAUKEE,2017,Pedestrian,Fatality,31,1
+MILWAUKEE,2017,Pedestrian,Fatality,33,1
+MILWAUKEE,2017,Pedestrian,Fatality,35,2
+MILWAUKEE,2017,Pedestrian,Fatality,41,1
+MILWAUKEE,2017,Pedestrian,Fatality,56,1
+MILWAUKEE,2017,Pedestrian,Fatality,60,1
+MILWAUKEE,2017,Pedestrian,Fatality,66,1
+MILWAUKEE,2017,Pedestrian,Fatality,68,1
+MILWAUKEE,2017,Pedestrian,Fatality,72,2
+MILWAUKEE,2017,Pedestrian,Fatality,NA,3
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,26,3
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,34,1
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,44,1
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,54,1
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,58,1
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,61,1
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,66,1
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,71,1
+MILWAUKEE,2018,Bicyclist,Suspected Serious Injury,NA,3
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,16,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,18,3
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,19,4
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,20,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,21,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,22,3
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,23,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,24,3
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,26,4
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,27,3
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,29,3
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,30,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,32,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,33,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,34,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,35,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,36,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,38,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,40,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,41,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,42,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,43,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,44,4
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,46,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,47,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,48,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,49,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,50,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,53,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,54,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,58,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,59,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,61,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,62,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,63,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,64,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,65,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,72,2
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,88,1
+MILWAUKEE,2018,Pedestrian,Suspected Serious Injury,NA,25
+MILWAUKEE,2018,Pedestrian,Fatality,20,1
+MILWAUKEE,2018,Pedestrian,Fatality,25,2
+MILWAUKEE,2018,Pedestrian,Fatality,34,1
+MILWAUKEE,2018,Pedestrian,Fatality,41,1
+MILWAUKEE,2018,Pedestrian,Fatality,46,1
+MILWAUKEE,2018,Pedestrian,Fatality,48,1
+MILWAUKEE,2018,Pedestrian,Fatality,50,1
+MILWAUKEE,2018,Pedestrian,Fatality,57,1
+MILWAUKEE,2018,Pedestrian,Fatality,58,1
+MILWAUKEE,2018,Pedestrian,Fatality,63,1
+MILWAUKEE,2018,Pedestrian,Fatality,67,1
+MILWAUKEE,2018,Pedestrian,Fatality,73,1
+MILWAUKEE,2018,Pedestrian,Fatality,NA,6
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,17,1
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,21,1
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,23,1
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,28,1
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,33,2
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,41,1
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,48,1
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,49,1
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,50,1
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,53,3
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,59,2
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,81,1
+MILWAUKEE,2019,Bicyclist,Suspected Serious Injury,NA,3
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,8,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,16,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,17,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,18,4
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,19,4
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,20,2
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,21,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,23,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,24,3
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,25,2
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,26,2
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,27,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,28,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,29,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,30,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,31,2
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,33,2
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,34,3
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,35,3
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,36,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,37,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,38,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,40,2
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,41,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,42,4
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,43,2
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,44,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,48,2
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,51,3
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,53,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,56,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,57,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,59,3
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,61,3
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,63,2
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,66,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,67,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,69,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,71,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,72,1
+MILWAUKEE,2019,Pedestrian,Suspected Serious Injury,NA,21
+MILWAUKEE,2019,Pedestrian,Fatality,17,1
+MILWAUKEE,2019,Pedestrian,Fatality,18,1
+MILWAUKEE,2019,Pedestrian,Fatality,19,1
+MILWAUKEE,2019,Pedestrian,Fatality,21,2
+MILWAUKEE,2019,Pedestrian,Fatality,22,1
+MILWAUKEE,2019,Pedestrian,Fatality,26,1
+MILWAUKEE,2019,Pedestrian,Fatality,27,1
+MILWAUKEE,2019,Pedestrian,Fatality,30,1
+MILWAUKEE,2019,Pedestrian,Fatality,31,1
+MILWAUKEE,2019,Pedestrian,Fatality,33,1
+MILWAUKEE,2019,Pedestrian,Fatality,43,1
+MILWAUKEE,2019,Pedestrian,Fatality,48,1
+MILWAUKEE,2019,Pedestrian,Fatality,50,1
+MILWAUKEE,2019,Pedestrian,Fatality,53,1
+MILWAUKEE,2019,Pedestrian,Fatality,NA,1
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,17,2
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,36,1
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,39,1
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,49,1
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,56,1
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,57,1
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,69,1
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,70,1
+MILWAUKEE,2020,Bicyclist,Suspected Serious Injury,NA,2
+MILWAUKEE,2020,Bicyclist,Fatality,28,1
+MILWAUKEE,2020,Bicyclist,Fatality,31,1
+MILWAUKEE,2020,Bicyclist,Fatality,48,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,16,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,19,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,21,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,22,2
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,23,3
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,24,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,25,3
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,26,2
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,27,3
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,28,3
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,31,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,32,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,33,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,34,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,36,2
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,37,2
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,39,2
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,43,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,45,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,46,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,48,2
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,56,2
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,60,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,61,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,62,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,63,2
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,71,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,72,1
+MILWAUKEE,2020,Pedestrian,Suspected Serious Injury,NA,31
+MILWAUKEE,2020,Pedestrian,Fatality,15,1
+MILWAUKEE,2020,Pedestrian,Fatality,20,1
+MILWAUKEE,2020,Pedestrian,Fatality,21,1
+MILWAUKEE,2020,Pedestrian,Fatality,23,1
+MILWAUKEE,2020,Pedestrian,Fatality,24,1
+MILWAUKEE,2020,Pedestrian,Fatality,27,1
+MILWAUKEE,2020,Pedestrian,Fatality,30,1
+MILWAUKEE,2020,Pedestrian,Fatality,32,1
+MILWAUKEE,2020,Pedestrian,Fatality,47,1
+MILWAUKEE,2020,Pedestrian,Fatality,48,1
+MILWAUKEE,2020,Pedestrian,Fatality,50,1
+MILWAUKEE,2020,Pedestrian,Fatality,54,1
+MILWAUKEE,2020,Pedestrian,Fatality,60,1
+MILWAUKEE,2020,Pedestrian,Fatality,71,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,18,2
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,20,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,21,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,22,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,23,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,25,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,29,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,40,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,41,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,42,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,57,2
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,63,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,66,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,90,1
+MILWAUKEE,2021,Bicyclist,Suspected Serious Injury,NA,6
+MILWAUKEE,2021,Bicyclist,Fatality,20,1
+MILWAUKEE,2021,Bicyclist,Fatality,56,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,12,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,16,3
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,18,2
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,19,2
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,21,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,22,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,24,5
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,25,4
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,26,3
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,27,3
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,29,2
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,30,2
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,31,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,32,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,34,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,37,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,38,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,39,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,42,3
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,43,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,45,2
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,51,2
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,52,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,53,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,54,2
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,55,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,57,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,58,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,59,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,61,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,65,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,68,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,74,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,78,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,83,1
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,88,2
+MILWAUKEE,2021,Pedestrian,Suspected Serious Injury,NA,34
+MILWAUKEE,2021,Pedestrian,Fatality,13,1
+MILWAUKEE,2021,Pedestrian,Fatality,21,1
+MILWAUKEE,2021,Pedestrian,Fatality,22,2
+MILWAUKEE,2021,Pedestrian,Fatality,23,1
+MILWAUKEE,2021,Pedestrian,Fatality,27,1
+MILWAUKEE,2021,Pedestrian,Fatality,30,1
+MILWAUKEE,2021,Pedestrian,Fatality,32,1
+MILWAUKEE,2021,Pedestrian,Fatality,34,1
+MILWAUKEE,2021,Pedestrian,Fatality,37,1
+MILWAUKEE,2021,Pedestrian,Fatality,40,1
+MILWAUKEE,2021,Pedestrian,Fatality,46,2
+MILWAUKEE,2021,Pedestrian,Fatality,51,1
+MILWAUKEE,2021,Pedestrian,Fatality,54,1
+MILWAUKEE,2021,Pedestrian,Fatality,NA,6
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,24,1
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,27,1
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,30,1
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,39,1
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,43,1
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,45,1
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,57,1
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,65,1
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,68,2
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,72,1
+MILWAUKEE,2022,Bicyclist,Suspected Serious Injury,NA,5
+MILWAUKEE,2022,Bicyclist,Fatality,33,1
+MILWAUKEE,2022,Bicyclist,Fatality,42,2
+MILWAUKEE,2022,Bicyclist,Fatality,64,1
+MILWAUKEE,2022,Bicyclist,Fatality,66,1
+MILWAUKEE,2022,Bicyclist,Fatality,85,1
+MILWAUKEE,2022,Bicyclist,Fatality,NA,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,16,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,18,3
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,19,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,20,2
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,21,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,22,3
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,23,2
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,27,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,28,2
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,29,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,30,3
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,31,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,32,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,34,4
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,35,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,39,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,43,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,45,2
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,51,2
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,55,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,57,2
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,59,2
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,65,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,67,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,69,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,71,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,75,2
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,77,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,80,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,88,1
+MILWAUKEE,2022,Pedestrian,Suspected Serious Injury,NA,21
+MILWAUKEE,2022,Pedestrian,Fatality,19,1
+MILWAUKEE,2022,Pedestrian,Fatality,23,2
+MILWAUKEE,2022,Pedestrian,Fatality,25,2
+MILWAUKEE,2022,Pedestrian,Fatality,30,1
+MILWAUKEE,2022,Pedestrian,Fatality,34,2
+MILWAUKEE,2022,Pedestrian,Fatality,35,1
+MILWAUKEE,2022,Pedestrian,Fatality,38,1
+MILWAUKEE,2022,Pedestrian,Fatality,40,2
+MILWAUKEE,2022,Pedestrian,Fatality,45,1
+MILWAUKEE,2022,Pedestrian,Fatality,46,1
+MILWAUKEE,2022,Pedestrian,Fatality,49,1
+MILWAUKEE,2022,Pedestrian,Fatality,54,1
+MILWAUKEE,2022,Pedestrian,Fatality,74,1
+MILWAUKEE,2022,Pedestrian,Fatality,77,1
+MILWAUKEE,2022,Pedestrian,Fatality,NA,10
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,21,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,24,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,29,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,35,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,37,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,47,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,54,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,60,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,61,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,63,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,73,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,74,1
+MILWAUKEE,2023,Bicyclist,Suspected Serious Injury,NA,2
+MILWAUKEE,2023,Bicyclist,Fatality,30,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,18,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,19,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,20,2
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,21,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,24,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,25,2
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,26,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,29,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,30,5
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,31,3
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,33,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,36,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,38,2
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,42,3
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,44,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,46,2
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,47,2
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,48,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,50,3
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,53,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,54,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,55,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,56,2
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,57,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,58,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,61,2
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,62,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,64,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,65,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,66,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,69,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,71,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,73,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,80,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,81,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,94,1
+MILWAUKEE,2023,Pedestrian,Suspected Serious Injury,NA,35
+MILWAUKEE,2023,Pedestrian,Fatality,20,2
+MILWAUKEE,2023,Pedestrian,Fatality,25,1
+MILWAUKEE,2023,Pedestrian,Fatality,27,1
+MILWAUKEE,2023,Pedestrian,Fatality,36,1
+MILWAUKEE,2023,Pedestrian,Fatality,38,1
+MILWAUKEE,2023,Pedestrian,Fatality,41,2
+MILWAUKEE,2023,Pedestrian,Fatality,42,1
+MILWAUKEE,2023,Pedestrian,Fatality,43,1
+MILWAUKEE,2023,Pedestrian,Fatality,46,1
+MILWAUKEE,2023,Pedestrian,Fatality,49,1
+MILWAUKEE,2023,Pedestrian,Fatality,50,1
+MILWAUKEE,2023,Pedestrian,Fatality,54,1
+MILWAUKEE,2023,Pedestrian,Fatality,56,1
+MILWAUKEE,2023,Pedestrian,Fatality,65,1
+MILWAUKEE,2023,Pedestrian,Fatality,NA,8
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,19,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,23,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,27,2
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,30,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,33,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,44,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,62,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,69,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,78,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,81,1
+MILWAUKEE,2024,Bicyclist,Suspected Serious Injury,NA,4
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,16,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,23,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,24,3
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,25,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,26,4
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,27,2
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,28,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,29,2
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,30,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,31,3
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,32,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,33,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,35,2
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,40,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,42,2
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,44,2
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,47,2
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,48,2
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,49,5
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,52,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,53,2
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,55,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,56,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,57,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,59,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,60,2
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,61,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,65,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,69,2
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,75,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,76,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,78,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,80,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,84,1
+MILWAUKEE,2024,Pedestrian,Suspected Serious Injury,NA,25
+MILWAUKEE,2024,Pedestrian,Fatality,18,1
+MILWAUKEE,2024,Pedestrian,Fatality,23,1
+MILWAUKEE,2024,Pedestrian,Fatality,24,2
+MILWAUKEE,2024,Pedestrian,Fatality,27,1
+MILWAUKEE,2024,Pedestrian,Fatality,32,1
+MILWAUKEE,2024,Pedestrian,Fatality,33,2
+MILWAUKEE,2024,Pedestrian,Fatality,34,1
+MILWAUKEE,2024,Pedestrian,Fatality,41,1
+MILWAUKEE,2024,Pedestrian,Fatality,46,1
+MILWAUKEE,2024,Pedestrian,Fatality,49,1
+MILWAUKEE,2024,Pedestrian,Fatality,63,1
+MILWAUKEE,2024,Pedestrian,Fatality,67,1
+MILWAUKEE,2024,Pedestrian,Fatality,91,1
+MILWAUKEE,2024,Pedestrian,Fatality,NA,4

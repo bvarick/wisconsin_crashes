@@ -1,21 +1,22 @@
-CNTYNAME,ped_type,ped_inj,ped_race,count
-MILWAUKEE,BIKE,Fatality,Black,4
-MILWAUKEE,BIKE,Fatality,Hispanic,2
-MILWAUKEE,BIKE,Fatality,White,4
-MILWAUKEE,BIKE,Fatality,NA,5
-MILWAUKEE,BIKE,Suspected Serious Injury,Asian,1
-MILWAUKEE,BIKE,Suspected Serious Injury,Black,8
-MILWAUKEE,BIKE,Suspected Serious Injury,Hispanic,7
-MILWAUKEE,BIKE,Suspected Serious Injury,White,30
-MILWAUKEE,BIKE,Suspected Serious Injury,NA,64
-MILWAUKEE,PED,Fatality,Black,32
-MILWAUKEE,PED,Fatality,Hispanic,3
-MILWAUKEE,PED,Fatality,Indian,1
-MILWAUKEE,PED,Fatality,White,21
-MILWAUKEE,PED,Fatality,NA,81
-MILWAUKEE,PED,Suspected Serious Injury,Asian,3
-MILWAUKEE,PED,Suspected Serious Injury,Black,103
-MILWAUKEE,PED,Suspected Serious Injury,Hispanic,20
-MILWAUKEE,PED,Suspected Serious Injury,Indian,2
-MILWAUKEE,PED,Suspected Serious Injury,White,86
-MILWAUKEE,PED,Suspected Serious Injury,NA,372
+CNTYNAME,vulnerable_role,ped_inj_name,vulnerable_race,count
+MILWAUKEE,Bicyclist,Suspected Serious Injury,Asian,2
+MILWAUKEE,Bicyclist,Suspected Serious Injury,Black,9
+MILWAUKEE,Bicyclist,Suspected Serious Injury,Hispanic,9
+MILWAUKEE,Bicyclist,Suspected Serious Injury,Indian,1
+MILWAUKEE,Bicyclist,Suspected Serious Injury,White,40
+MILWAUKEE,Bicyclist,Suspected Serious Injury,NA,64
+MILWAUKEE,Bicyclist,Fatality,Black,4
+MILWAUKEE,Bicyclist,Fatality,Hispanic,2
+MILWAUKEE,Bicyclist,Fatality,White,4
+MILWAUKEE,Bicyclist,Fatality,NA,5
+MILWAUKEE,Pedestrian,Suspected Serious Injury,Asian,6
+MILWAUKEE,Pedestrian,Suspected Serious Injury,Black,137
+MILWAUKEE,Pedestrian,Suspected Serious Injury,Hispanic,29
+MILWAUKEE,Pedestrian,Suspected Serious Injury,Indian,2
+MILWAUKEE,Pedestrian,Suspected Serious Injury,White,119
+MILWAUKEE,Pedestrian,Suspected Serious Injury,NA,376
+MILWAUKEE,Pedestrian,Fatality,Black,46
+MILWAUKEE,Pedestrian,Fatality,Hispanic,5
+MILWAUKEE,Pedestrian,Fatality,Indian,1
+MILWAUKEE,Pedestrian,Fatality,White,25
+MILWAUKEE,Pedestrian,Fatality,NA,83

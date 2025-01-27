@@ -105,6 +105,20 @@ TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% bike_roles
                                                                      NA)))
 ```
 
+## Add race names to TOPS data
+```{r TOPSrace, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+race <- data.frame(race_name = c("Asian", "Black", "Indian","Hispanic","White"), 
+                   code = c("A", "B", "I", "H", "W"))
+
+TOPS_data <- left_join(TOPS_data, race %>% select(race_name, code), join_by(RACE1 == code)) %>% rename(race_name1 = race_name)
+TOPS_data <- left_join(TOPS_data, race %>% select(race_name, code), join_by(RACE2 == code)) %>% rename(race_name2 = race_name)
+TOPS_data <- TOPS_data %>% mutate(vulnerable_race = ifelse(ROLE1 %in% vuln_roles, 
+                                                   race_name1, 
+                                                   ifelse(ROLE2 %in% vuln_roles, 
+                                                          race_name2,
+                                                          NA)))
+```
+
 ## Save resulting data table as an Rda file for use in other documents
 ```{r savecleaneddata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 save(TOPS_data, file = "data/TOPS/TOPS_data.Rda")
