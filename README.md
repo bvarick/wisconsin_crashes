@@ -16,6 +16,8 @@ This is a series of RMarkdown files that generates maps of crashes between motor
 - OpenStreetMap Routing Machine `make osrm`: this downloads the most recent OpenStreetMap data for Wisconsin, and starts docker containers to run the OpenStreetMap Routing Machine to calculate IsoDistances.
 - School Crash Maps `make schoolpdfs`: generates maps of all the schools in Wisconsin and where cars are hitting kids This script pulls in the TOPS data from a folder of csv’s that you’ve downloaded from the data retrieval tool. It also draws the walk boundary around each school, this is done with a OpenStreetMap routing engine that is running in a docker container. It also needs access to an API key for StadiaMaps to download all the basemap tiles. I recommend downloading the whole state and filtering the data with the script. You can edit file `parameters/run_parameters` to choose what county, school type, and district to generate maps for
 - Dynamic Map `make crashmaps_dynamic`: This takes the TOPS data and generates dynamic leaflet maps to host on our website. It generates 4 maps: without a title (for in a frame), and with a title, in both English and Spanish.
+- Milwaukee Specific map `crashmaps_dynamic_milwaukee`: generate a web map for Milwaukee that includes more fine-grained visualizations of crash densities.
+
 
 ## R Scripts
 I'm working to move these to RMarkdown files

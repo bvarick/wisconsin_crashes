@@ -90,8 +90,6 @@ Pedestrian_Crash_Data <- TOPS_data %>%
 ```
 
 
-
-
 ## Load Census data
 ```{r censusdata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 

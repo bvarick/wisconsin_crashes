@@ -1,0 +1,166 @@
+---
+title: "Dynamic Crash Map - Milwaukee"
+output:
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+editor_options:
+  chunk_output_type: console
+---
+
+
+# Input Data & Configuration
+
+## Libraries
+```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+date()
+rm(list=ls())
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(RColorBrewer)
+library(tidycensus)
+library(htmltools)
+library(magick)
+library(htmlwidgets)
+library(MASS)
+library(raster)
+Sys.setenv(LANG = "en-US.UTF-8")
+focus_county <- "MILWAUKEE"
+```
+
+## Load TOPS data
+```{r loadTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+load(file = "data/TOPS/TOPS_data.Rda")
+load(file = "data/TOPS/vuln_roles.Rda")
+load(file = "data/TOPS/retrieve_date.Rda")
+load(file = "data/TOPS/injury_severity.Rda")
+injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = injury_severity$InjSevName)
+
+```
+
+## Mutate TOPS_data
+```{r mutateTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+TOPS_data <- TOPS_data %>% 
+  mutate(Year = year,
+         PedestrianInjurySeverity = ped_inj_name,
+         CrashDate = CRSHDATE,
+         CrashTime = CRSHTIME,
+         County = CNTYNAME,
+         Street = ONSTR,
+         CrossStreet = ATSTR) %>%
+  mutate(PedestrianAge = ifelse(ROLE1 %in% vuln_roles, age1, age2))
+
+
+TOPS_geom <- st_as_sf(TOPS_data %>% filter(!is.na(latitude)), coords = c("longitude", "latitude"), crs = 4326)
+```
+
+## load school locations ----
+```{r loadschooldata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+WI_schools <- st_read(dsn = "data/Schools/Wisconsin_Public_Schools_-5986231931870160084.gpkg")
+WI_schools <- WI_schools %>% 
+  filter(is.double(LAT),
+         LAT > 0) %>%
+  select("SCHOOL", "DISTRICT", "SCHOOLTYPE", "LAT", "LON")
+
+school_translate <- data.frame(en = c("Elementary School", "High School", "Combined Elementary/Secondary School", "Middle School", "Junior High School"),
+                               es = c("Escuela primaria", "Escuela secundaria", "Escuela primaria/secundaria combinada", "Escuela secundaria", "Escuela secundaria"))
+
+WI_schools <- WI_schools %>%
+  mutate(SCHOOLTYPE_es <- school_translate$es[match(WI_schools$SCHOOLTYPE, school_translate$en)])
+
+WI_schools <- WI_schools %>% filter(COUNTY %in% str_to_title(focus_county))
+```
+
+### Load school symbol
+```{r loadschoolicon, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+school_symbol <- makeIcon(iconUrl = "icons/school_FILL0_wght400_GRAD0_opsz24.png",
+                          iconWidth = 24,
+                          iconHeight = 24,
+                          iconAnchorX = 12,
+                          iconAnchorY = 12)
+```
+
+## Pull certain columns
+```{r pullcolumns, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+
+focus_columns <- c("PedestrianInjurySeverity", "CrashDate", "CrashTime", "County", "Street", "CrossStreet", "PedestrianAge", "Year", "vulnerable_role", "vulnerable_role_es")
+
+Pedestrian_Crash_Data <- TOPS_data %>% 
+  filter(CNTYNAME == focus_county,
+         !is.na(latitude)) %>%
+  dplyr::select(all_of(c(focus_columns, "longitude", "latitude")))
+```
+
+# generate density map ----
+```{r density, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+crash_density <- kde2d(Pedestrian_Crash_Data$longitude, Pedestrian_Crash_Data$latitude, n = 200)
+crash_density <- raster(crash_density)
+crash_density <- cut(crash_density, breaks = 10)
+crash_density_poly <- rasterToPolygons(crash_density, dissolve = T)
+
+density_pal <- colorNumeric(palette = "YlOrRd", domain = c(min(crash_density_poly$layer, na.rm = TRUE), max(crash_density_poly$layer, na.rm = TRUE)))
+```
+
+
+## add county census data ----
+```{r countycensus, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+census_api_key(key = substr(read_file(file = "api_keys/census_api_key"), 1, 40))
+county_populations <- get_estimates(geography = "county", year = 2022, product = "population", state = "Wisconsin", geometry = TRUE) %>%
+  filter(variable == "POPESTIMATE") %>%
+  mutate(County = str_to_upper(str_replace(NAME, " County, Wisconsin", "")))
+county_populations <- st_transform(county_populations, crs = 4326) %>% filter(County %in% focus_county)
+```
+
+## Generate map
+```{r generatemap, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+milwaukee_crash_map <- 
+  leaflet(options = leafletOptions(preferCanvas = TRUE)) %>%
+  addProviderTiles(providers$Stadia.AlidadeSmooth) %>%
+  addPolygons(data = county_populations,
+              color = "black",
+              weight = 1,
+              fill = FALSE,
+              group = "County Lines") %>%
+  addPolygons(data = crash_density_poly,
+              color = "black",
+              weight = 0,
+              opacity = 0.9,
+              group = "Heat Map",
+              fillColor = density_pal(crash_density_poly$layer))%>%
+  addMarkers(data = WI_schools,
+             lng=WI_schools$LON,
+             lat = WI_schools$LAT,
+             icon = school_symbol,
+             label = lapply(paste0("<b>", WI_schools$SCHOOL, " School</b></br>",
+                                   WI_schools$DISTRICT, " School District</br>",
+                                   WI_schools$SCHOOLTYPE), htmltools::HTML),
+             group = "Schools") %>%
+  addCircleMarkers(data = Pedestrian_Crash_Data,
+                   lng=Pedestrian_Crash_Data$longitude,
+                   lat=Pedestrian_Crash_Data$latitude,
+                   fillColor=injury_severity_pal(Pedestrian_Crash_Data$PedestrianInjurySeverity),
+                   radius=4,
+                   stroke=TRUE,
+                   color = "black",
+                   weight = 1,
+                   fillOpacity = 0.8,
+                   label = lapply(paste0("<b>", str_to_title(replace_na(Pedestrian_Crash_Data$vulnerable_role, ""))," </b><br>",
+                                         Pedestrian_Crash_Data$CrashDate, "</br>",
+                                         Pedestrian_Crash_Data$PedestrianInjurySeverity, "</br>",
+                                         replace_na(Pedestrian_Crash_Data$vulnerable_role, ""), " age: ", ifelse(!is.na(Pedestrian_Crash_Data$PedestrianAge), Pedestrian_Crash_Data$PedestrianAge, "unknown age")), htmltools::HTML),
+                   group = "Crash Points") %>%
+  addLegend(position = "bottomleft", labels = injury_severity$InjSevName, colors = injury_severity$color, group = "Crash Points", title = "Injury Severity") %>%
+  groupOptions(group = "Schools", zoomLevels = 15:20) %>%
+  groupOptions(group = "Crash Points", zoomLevels = 13:20) %>%
+  groupOptions(group = "County Lines", zoomLevels = 5:20) %>%
+  groupOptions(group = "Heat Map", zoomLevels = 5:13)
+
+  
+milwaukee_crash_map
+
+saveWidget(milwaukee_crash_map, file = "figures/dynamic_crash_maps/milwaukee_pedestrian_crash_map.html", selfcontained = TRUE)
+```
