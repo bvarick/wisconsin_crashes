@@ -31,7 +31,7 @@ library(parallel)
 ```
 
 ## Load TOPS data
-```{r cleandata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+```{r loadTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 load(file = "data/TOPS/TOPS_data.Rda")
 load(file = "data/TOPS/vuln_roles.Rda")
 load(file = "data/TOPS/retrieve_date.Rda")
