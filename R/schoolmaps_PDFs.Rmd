@@ -141,13 +141,16 @@ for(county in county_focus) {
   TOPS_data %>% 
     filter(CNTYNAME %in% county) %>% 
     filter(ROLE1 %in% vuln_roles & age1 < 18 | ROLE2 %in% vuln_roles & age2 < 18) %>% 
-    group_by(year) %>% summarise(count = n_distinct(DOCTNMBR)) %>%
+    filter(ped_inj %in% c("B", "A", "K")) %>%
+    group_by(year) %>% 
+    summarise(count = n_distinct(DOCTNMBR)) %>%
+    complete(year, fill = list(count = 0)) %>%
     ggplot() +
     geom_col(aes(x = year,
                  y = count),
              fill = "darkred") +
-    scale_y_continuous(expand = expansion(mult = c(0,0.07))) +
-    labs(title = paste0("Pedestrians/bicyclists under 18 years old hit by cars in ",
+    scale_y_continuous(expand = expansion(mult = c(0,0.07)), breaks = scales::pretty_breaks(min.n = 0)) +
+    labs(title = paste0("Pedestrians/bicyclists under 18 years old killed or injured by drivers in ",
                         str_to_title(county), 
                         " County"),
          x = "Year",
