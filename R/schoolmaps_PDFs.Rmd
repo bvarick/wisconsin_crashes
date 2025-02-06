@@ -118,16 +118,16 @@ if(str_to_lower(county_focus) == "all") {
 # set which school types to generate figures for
 school_type_focus <- run_parameters$school_type_focus
 if(str_to_lower(school_type_focus) == "all") {
-  school_type_focus <- unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus)) %>% pull(SCHOOLTYPE))
+  school_type_focus <- unique(WI_schools %>% pull(SCHOOLTYPE))
 }
 
 # set which school types to generate figures for
 district_focus <- run_parameters$district_focus
 if(str_to_lower(district_focus) == "all") {
-  district_focus <- unique(WI_schools %>%   filter(CTY_DIST %in% str_to_title(county_focus),  SCHOOLTYPE %in% school_type_focus, !is.na(DISTRICT_NAME)) %>%  pull(DISTRICT_NAME))
+  district_focus <- unique(WI_schools %>% pull(DISTRICT_NAME))
 }
 
-school_number <- length(unique(WI_schools %>% filter(CTY_DIST %in% str_to_title(county_focus),  
+school_number <- length(unique(WI_schools %>% filter(str_to_upper(CTY_DIST) %in% county_focus,  
                                               SCHOOLTYPE %in% school_type_focus, 
                                               DISTRICT_NAME %in% district_focus) %>%  
                           pull(district_school)))
@@ -257,9 +257,12 @@ generate_school_maps <- function(district) {
   
   message(paste("***", district, "School District |"))
   options(ggmap.file_drawer = paste0("basemaps/districts/", district))
-  dir.create(file_drawer(), recursive = TRUE, showWarnings = FALSE)
-  saveRDS(list(), file_drawer("index.rds"))
-  readRDS(file_drawer("index.rds"))
+  if(file.exists(paste0("basemaps/districts/", district, "/index.rds")) & !run_parameters$refresh_basemaps) {
+    readRDS(file_drawer("index.rds"))
+  } else {
+    dir.create(file_drawer(), recursive = TRUE, showWarnings = FALSE)
+    saveRDS(list(), file_drawer("index.rds"))
+  }
   file_drawer("index.rds")
   for(school in WI_schools %>%
       filter(DISTRICT_NAME %in% district,

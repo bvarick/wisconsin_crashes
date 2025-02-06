@@ -2,3 +2,6 @@
 *
 # Except this file
 !.gitignore
+
+# Except the run_parameters template
+!run_parameters_template.csv
