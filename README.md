@@ -10,6 +10,9 @@ This is a series of RMarkdown files that generates maps of crashes between motor
 ### A map of crashes near East High School in Madison, WI:
 ![example routes figure](examples/example-school.png)
 
+## Here is where the web maps are hosted
+[Wisconsin Bike Pedestrian Crash Map](https://wisconsinbikefed.org/what-we-do/advocacy/wisconsin-bike-pedestrian-crash-map/)
+
 ## To process data and generate figures
 
 - Pre Process TOPS data `make TOPS_data_process`: This combines TOPS data exports from different years and reformats the data.
