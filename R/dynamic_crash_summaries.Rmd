@@ -1,0 +1,74 @@
+---
+title: "Dynamic Crash Summaries"
+output:
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+editor_options:
+  chunk_output_type: console
+---
+
+# Input Data & Configuration
+
+## Libraries
+```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+date()
+rm(list=ls())
+library(tidyverse)
+library(RColorBrewer)
+library(leaflet)
+library(htmltools)
+library(htmlwidgets)
+library(plotly)
+Sys.setenv(LANG = "en-US.UTF-8")
+```
+
+
+## Load TOPS data
+```{r loadTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+load(file = "data/TOPS/TOPS_data.Rda")
+load(file = "data/TOPS/vuln_roles.Rda")
+load(file = "data/TOPS/retrieve_date.Rda")
+load(file = "data/TOPS/injury_severity.Rda")
+injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = injury_severity$InjSevName)
+
+```
+
+## Summarize data by county
+```{r summarizeData, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+
+county_summaries <- TOPS_data %>%
+  group_by(CNTYNAME, year, ped_inj_name, vulnerable_role) %>%
+  summarize(count = n())
+
+```
+
+## Make graphs
+```{r makeGraphs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+
+county_focus <- "MILWAUKEE"
+county_focus <- unique(county_summaries %>% pull(CNTYNAME))
+
+injury_focus <- c("Suspected Minor Injury", "Suspected Serious Injury", "Fatality")
+
+wisconsin_crash_summary <- ggplotly(
+ggplot(data = county_summaries %>% 
+         filter(CNTYNAME %in% county_focus) %>% 
+         filter(ped_inj_name %in% injury_focus) %>%
+         group_by(year, ped_inj_name) %>%
+         summarize(count = n()) %>%
+         mutate(Year = year, "Injury severity" = ped_inj_name, "Number of crashes" = count)) +
+  geom_col(aes(x = Year,
+               y = `Number of crashes`,
+               fill = `Injury severity`)) +
+  scale_fill_manual(values = injury_severity_pal(injury_severity %>% filter(InjSevName %in% injury_focus) %>% pull(InjSevName))) +
+  labs(title = "People walking and biking injured in car crashes in Wisconsin")
+)
+
+saveWidget(wisconsin_crash_summary, file = "figures/dynamic_crash_summaries/wisconsin_crash_summary.html", 
+           selfcontained = TRUE,
+           title = "Wisconsin Crash Summary")
+```
