@@ -41,7 +41,7 @@ injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = inj
 ```{r summarizeData, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 
 county_summaries <- TOPS_data %>%
-  group_by(CNTYNAME, year, ped_inj_name, vulnerable_role) %>%
+  group_by(CNTYNAME, year, ped_inj_name) %>%
   summarize(count = n())
 
 ```
@@ -49,7 +49,7 @@ county_summaries <- TOPS_data %>%
 ## Make graphs
 ```{r makeGraphs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 
-county_focus <- "MILWAUKEE"
+#county_focus <- "MILWAUKEE"
 county_focus <- unique(county_summaries %>% pull(CNTYNAME))
 
 injury_focus <- c("Suspected Minor Injury", "Suspected Serious Injury", "Fatality")
@@ -71,4 +71,78 @@ ggplot(data = county_summaries %>%
 saveWidget(wisconsin_crash_summary, file = "figures/dynamic_crash_summaries/wisconsin_crash_summary.html", 
            selfcontained = TRUE,
            title = "Wisconsin Crash Summary")
+```
+
+```{r makeGraphsDropdown, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+# Create a list to store plotly objects for each county, including "All of Wisconsin"
+county_plots <- list()
+
+# Generate plot for "All of Wisconsin"
+all_wisconsin_data <- county_summaries %>%
+  filter(ped_inj_name %in% injury_focus) %>%
+  group_by(year, ped_inj_name) %>%
+  summarize(count = n()) %>%
+  mutate(Year = year, "Injury severity" = ped_inj_name, "Number of crashes" = count)
+
+p_all_wisconsin <- ggplot(all_wisconsin_data, aes(x = Year, y = `Number of crashes`, fill = `Injury severity`)) +
+  geom_col() +
+  scale_fill_manual(values = injury_severity_pal(injury_severity %>% filter(InjSevName %in% injury_focus) %>% pull(InjSevName))) +
+  labs(title = "People walking and biking injured in car crashes in all of Wisconsin") +
+  theme_minimal()
+
+county_plots[["All of Wisconsin"]] <- ggplotly(p_all_wisconsin)
+
+# Iterate over each unique county to create plotly objects
+for (county in unique(county_summaries$CNTYNAME)) {
+  plot_data <- county_summaries %>%
+    filter(CNTYNAME == county) %>%
+    filter(ped_inj_name %in% injury_focus) %>%
+    mutate(Year = year, "Injury severity" = ped_inj_name, "Number of crashes" = count)
+  
+  p <- ggplot(plot_data, aes(x = Year, y = `Number of crashes`, fill = `Injury severity`)) +
+    geom_col() +
+    scale_fill_manual(values = injury_severity_pal(injury_severity %>% filter(InjSevName %in% injury_focus) %>% pull(InjSevName))) +
+    labs(title = paste("People walking and biking injured in car crashes in", county, "County")) +
+    theme_minimal()
+  
+  county_plots[[county]] <- ggplotly(p)
+}
+
+# Render HTML with JavaScript to switch between plots
+html_output <- tags$html(
+  tags$head(
+    tags$title("County Crash Summary"),
+    tags$script(
+      HTML("
+        function showPlot(county) {
+          var plots = document.getElementsByClassName('county-plot');
+          for (var i = 0; i < plots.length; i++) {
+            plots[i].style.display = 'none';
+          }
+          document.getElementById(county).style.display = 'block';
+        }
+        window.onload = function() {
+          showPlot('All of Wisconsin'); // Default to 'All of Wisconsin'
+        }
+      ")
+    )
+  ),
+  tags$body(
+    tags$h1("County Crash Summary"),
+    tags$select(onchange = "showPlot(this.value)",
+                lapply(names(county_plots), function(county) {
+                  tags$option(value = county, county)
+                })
+    ),
+    lapply(names(county_plots), function(county) {
+      tags$div(id = county, class = "county-plot", style = "display:none;", county_plots[[county]])
+    })
+  )
+)
+
+# Save the output to an HTML file
+save_html(html_output, file = "figures/dynamic_crash_summaries/county_crash_summaries.html")
+
+# Open the file in a web browser
+browseURL("figures/dynamic_crash_summaries/county_crash_summaries.html")
 ```
