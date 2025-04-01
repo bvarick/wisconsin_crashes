@@ -2,7 +2,3 @@
 *
 # Except this file
 !.gitignore
-
-# and the osrm directory
-!osrm/
-

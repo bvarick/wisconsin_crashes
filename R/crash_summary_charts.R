@@ -3,86 +3,10 @@ library(RColorBrewer)
 library(tidycensus)
 library(ggrepel)
 
-## Load TOPS data ----
-## To load TOPS data for the whole state for crashes involving bikes and pedestrians):
-## Step 1 - download csv from the TOPS Data Retrieval Tool with the query:  SELECT * FROM DTCRPRD.SUMMARY_COMBINED C WHERE C.CRSHDATE BETWEEN TO_DATE('2023-JAN','YYYY-MM') AND LAST_DAY(TO_DATE('2023-DEC','YYYY-MM')) AND (C.BIKEFLAG = 'Y' OR C.PEDFLAG = 'Y') ORDER BY C.DOCTNMBR 
-## Step 2 - include RACE1 and RACE2 for download in preferences
-## Step 3 - save the csv in the "data" directory as crash-data-download_2023.csv
-TOPS_data <- as.list(NULL)
-for (file in list.files(path = "data/TOPS/", pattern = "crash-data-download")) {
-  message(paste("importing data from file: ", file))
-  year <- substr(file, 21, 24)
-  csv_run <- read_csv(file = paste0("data/TOPS/",file), col_types = cols(.default = "c"))
-  csv_run["retreive_date"] <- file.info(file = paste0("data/TOPS/",file))$mtime
-  TOPS_data[[file]] <- csv_run
-}
-rm(csv_run, file, year)
-TOPS_data <- bind_rows(TOPS_data)
-
-## clean up data ----
-TOPS_data <- TOPS_data %>% 
-  mutate(date = mdy(CRSHDATE), 
-         age1 = as.double(AGE1),
-         age2 = as.double(AGE2),
-         latitude  = as.double(LATDECDG),
-         longitude = as.double(LONDECDG)) %>% 
-  mutate(month = month(date, label = TRUE),
-         year = as.factor(year(date)))
-
-retrieve_date <- max(TOPS_data %>% filter(year %in% max(year(TOPS_data$date), na.rm = TRUE)) %>% pull(retreive_date))
-
-# Injury Severy Index and Color -----
-injury_severity <- data.frame(InjSevName = c("No apparent injury", "Possible Injury", "Suspected Minor Injury","Suspected Serious Injury","Fatality"), 
-                              code = c("O", "C", "B", "A", "K"),
-                              color = c("#fafa6e", "#edc346", "#d88d2d", "#bd5721", "#9b1c1c"))
-
-TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR1 == code)) %>% 
-  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
-  rename(InjSevName1 = InjSevName)
-TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(INJSVR2 == code)) %>% 
-  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
-  rename(InjSevName2 = InjSevName)
-
-# add bike or pedestrian roles ----
-
-bike_roles <- c("BIKE", "O BIKE")
-ped_roles <- c("PED", "O PED", "PED NO")
-vuln_roles <- c(bike_roles, ped_roles)
-
-TOPS_data <- TOPS_data %>% mutate(ped_inj = ifelse(ROLE1 %in% vuln_roles, 
-                                                   INJSVR1, 
-                                                   ifelse(ROLE2 %in% vuln_roles, 
-                                                          INJSVR2,
-                                                          NA)))
-
-# bike or ped
-TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% bike_roles | ROLE2 %in% bike_roles, 
-                                                           "Bicyclist", 
-                                                           ifelse(ROLE1 %in% ped_roles | ROLE2 %in% ped_roles, 
-                                                                  "Pedestrian",
-                                                                  NA)))
-
-TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(ped_inj == code)) %>% 
-  mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
-  rename(ped_inj_name = InjSevName)
-
-# Race names
-race <- data.frame(race_name = c("Asian", "Black", "Indian","Hispanic","White"), 
-                   code = c("A", "B", "I", "H", "W"))
-
-TOPS_data <- left_join(TOPS_data, race %>% select(race_name, code), join_by(RACE1 == code)) %>% rename(race_name1 = race_name)
-TOPS_data <- left_join(TOPS_data, race %>% select(race_name, code), join_by(RACE2 == code)) %>% rename(race_name2 = race_name)
-
-## make mutate TOPS_data
-TOPS_data <- TOPS_data %>% 
-  mutate(Year = year,
-         PedestrianInjurySeverity = ped_inj_name,
-         CrashDate = CRSHDATE,
-         CrashTime = CRSHTIME,
-         County = CNTYNAME,
-         Street = ONSTR,
-         CrossStreet = ATSTR) %>%
-  mutate(PedestrianAge = ifelse(ROLE1 %in% vuln_roles, age1, age2))
+load(file = "data/TOPS/TOPS_data.Rda")
+load(file = "data/TOPS/vuln_roles.Rda")
+load(file = "data/TOPS/retrieve_date.Rda")
+load(file = "data/TOPS/injury_severity.Rda")
 
 # add population census data ----
 census_api_key(key = substr(read_file(file = "api_keys/census_api_key"), 1, 40))
@@ -98,31 +22,30 @@ county_focus <- unique(TOPS_data %>%
                          slice_max(TotalCrashes, n = 8) %>%
                          pull(CNTYNAME))
 
-
 TOPS_data %>%
   filter(ped_inj %in% c("A", "K")) %>%
-  group_by(CNTYNAME, Year) %>%
+  group_by(CNTYNAME, year) %>%
   summarise(TotalCrashes = n()) %>%
   mutate(County = CNTYNAME) %>%
   left_join(county_populations, join_by("County")) %>%
   mutate(CrashesPerPopulation = TotalCrashes/value*100000) %>%
   filter(County %in% county_focus) %>%
   ggplot() +
-  geom_line(aes(x = Year,
+  geom_line(aes(x = year.x,
                 y = CrashesPerPopulation,
                 color = str_to_title(CNTYNAME),
                 group = CNTYNAME),
             size = 1) +
   geom_label_repel(data = TOPS_data %>%
                      filter(ped_inj %in% c("A", "K")) %>%
-                     group_by(CNTYNAME, Year) %>%
+                     group_by(CNTYNAME, year) %>%
                      summarise(TotalCrashes = n()) %>%
                      mutate(County = CNTYNAME) %>%
                      left_join(county_populations, join_by("County")) %>%
                      mutate(CrashesPerPopulation = TotalCrashes/value*100000) %>%
                      filter(County %in% county_focus,
-                            Year == 2023),
-                   aes(x = Year,
+                            year.x == year(max(TOPS_data$date))),
+                   aes(x = year.x,
                        y = CrashesPerPopulation,
                        label = str_to_title(County),
                        fill = County),
@@ -135,20 +58,20 @@ TOPS_data %>%
   scale_fill_brewer(type = "qual", guide = NULL) +
   scale_x_discrete(expand = expansion(add = c(0.5,0.75))) +
   labs(title = "Drivers crashing into pedestrians & bicyclists per 100,000 residents",
-       subtitle = "Fatalities and Severe Injuries | 2017-2023",
+       subtitle = paste0("Fatalities and Severe Injuries | ", year(min(TOPS_data$date)), "-", year(max(TOPS_data$date))),
        x = "Year",
        y = "Total crashes per year per 100,000 residents",
        color = "County",
        caption = paste0("crash data from UW TOPS lab - retrieved ",
                         strftime(retrieve_date, format = "%m/%Y"),
-                        " per direction of the WisDOT Bureau of Transportation Safety",
-                        "\nbasemap from StadiaMaps and OpenStreetMap Contributers")) +
+                        " per direction of the WisDOT Bureau of Transportation Safety")) +
   theme(plot.caption = element_text(color = "grey"))
 
-ggsave(file = paste0("figures/crash_summaries/counties_year.pdf"),
-       height = 8.5,
-       width = 11,
-       units = "in")
+ggsave(file = paste0("figures/crash_summaries/counties_year.png"),
+       height = 5,
+       width = 8,
+       units = "in",
+       dpi = 300)
 
 TOPS_data %>%
   filter(County %in% county_focus) %>%
@@ -160,12 +83,31 @@ TOPS_data %>%
                fill = vulnerable_role))
 
 
+county_focus = "DANE"
+
 TOPS_data %>%
-  filter(County %in% "DANE") %>%
-  group_by(County, vulnerable_role, year) %>%
+  filter(CNTYNAME %in% county_focus) %>%
+  filter(ped_inj %in% c("A", "K", "B")) %>%
+  group_by(CNTYNAME, vulnerable_role, year) %>%
   summarise(count = n()) %>%
   ggplot() +
   geom_col(aes(x = year,
                y = count,
                fill = vulnerable_role),
-           position = position_dodge())
+           position = position_dodge()) +
+  scale_fill_brewer(palette = "Dark2") +
+  labs(title = paste0("Car crashes with vulnerable road users in ", str_to_title(county_focus), " County"),
+       subtitle = paste0("Fatalities and injuries"),
+       x = "Year",
+       y = "Number of Crashes",
+       fill = NULL,
+       caption = paste0("crash data from UW TOPS lab - retrieved ",
+                        strftime(retrieve_date, format = "%m/%Y"),
+                        " per direction of the WisDOT Bureau of Transportation Safety")) +
+  theme(plot.caption = element_text(color = "grey"))
+
+ggsave(file = paste0("figures/crash_summaries/", county_focus, "_vuln_role_year.png"),
+       height = 5,
+       width = 8,
+       units = "in",
+       dpi = 300)

@@ -22,8 +22,9 @@ library(tidyverse)
 library(RColorBrewer)
 library(tidycensus)
 library(ggrepel)
-county_focus <- c("MILWAUKEE")
-municipality_focus <- c("MILWAUKEE")
+library(leaflet)
+county_focus <- c("DANE")
+municipality_focus <- c("DANE")
 ```
 
 ## Load TOPS data
