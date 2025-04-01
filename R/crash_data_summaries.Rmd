@@ -24,7 +24,7 @@ library(tidycensus)
 library(ggrepel)
 library(leaflet)
 county_focus <- c("DANE")
-municipality_focus <- c("DANE")
+municipality_focus <- c("MADISON")
 ```
 
 ## Load TOPS data
@@ -37,6 +37,13 @@ injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = inj
 
 ```
 
+## Set parameters
+```{r parameters, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+county_focus <- c("DANE")
+municipality_focus <- c("MADISON")
+injury_severy_focus <- c("A", "K", "B")
+```
+
 ## build data summaries for city
 ```{r citysummaries, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 
@@ -44,21 +51,21 @@ data_summary <- list(NULL)
 # crashes by year that resulted in a pedestrian fatality or severe injury
 data_summary[["crash_by_year"]] <- TOPS_data %>%
   filter(MUNINAME %in% municipality_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   group_by(MUNINAME, year, vulnerable_role, ped_inj_name) %>%
   summarise(count = n_distinct(DOCTNMBR))
 
 # crashes by race of pedestrian/bicyclist for focus year
 data_summary[["crash_by_race"]] <- TOPS_data %>%
   filter(MUNINAME %in% municipality_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   group_by(MUNINAME, vulnerable_role, ped_inj_name, vulnerable_race) %>%
   summarise(count = n_distinct(DOCTNMBR))
 
 # crashes by race of driver that resulted in a pedestrian fatality or severe injury
 data_summary[["crash_by_driver_race"]] <- TOPS_data %>%
   filter(MUNINAME %in% municipality_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   mutate(driver_race = ifelse(ROLE1 %in% c("DR"), race_name1, ifelse(ROLE2 %in% c("DR"), race_name2, NA))) %>%
   group_by(MUNINAME, year, vulnerable_role, ped_inj_name, driver_race) %>%
   summarise(count = n_distinct(DOCTNMBR))
@@ -66,7 +73,7 @@ data_summary[["crash_by_driver_race"]] <- TOPS_data %>%
 # crashes by age of pedestrian/bicyclist
 data_summary[["crash_by_age"]] <- TOPS_data %>%
   filter(MUNINAME %in% municipality_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) %>%
   group_by(MUNINAME, year, vulnerable_role, ped_inj_name, vulnerable_age) %>%
   summarise(count = n_distinct(DOCTNMBR))
@@ -74,7 +81,7 @@ data_summary[["crash_by_age"]] <- TOPS_data %>%
 # crashes by age of driver that resulted in a severe injury or fatality of a pedestrian/bicyclist
 data_summary[["crash_by_driver_age"]] <- TOPS_data %>%
   filter(MUNINAME %in% municipality_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   mutate(driver_age = ifelse(ROLE1 %in% c("DR"), age1, ifelse(ROLE2 %in% c("DR"), age2, NA))) %>%
   group_by(MUNINAME, year, vulnerable_role, ped_inj_name, driver_age) %>%
   summarise(count = n_distinct(DOCTNMBR))
@@ -82,7 +89,7 @@ data_summary[["crash_by_driver_age"]] <- TOPS_data %>%
 # crashes by sex of pedestrian/bicyclist
 data_summary[["crash_by_sex"]] <- TOPS_data %>%
   filter(MUNINAME %in% municipality_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   mutate(vulnerable_sex = ifelse(ROLE1 %in% vuln_roles, SEX1, ifelse(ROLE2 %in% vuln_roles, SEX1, NA))) %>%
   group_by(MUNINAME, year, vulnerable_role, ped_inj_name, vulnerable_sex) %>%
   summarise(count = n_distinct(DOCTNMBR))
@@ -90,14 +97,19 @@ data_summary[["crash_by_sex"]] <- TOPS_data %>%
 # crashes by sex of driver that resulted in a severe injury or fatality of a pedestrian/bicyclist
 data_summary[["crash_by_driver_sex"]] <- TOPS_data %>%
   filter(MUNINAME %in% municipality_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   mutate(driver_sex = ifelse(ROLE1 %in% c("DR"), SEX1, ifelse(ROLE2 %in% c("DR"), SEX2, NA))) %>%
   group_by(MUNINAME, year, vulnerable_role, ped_inj_name, driver_sex) %>%
   summarise(count = n_distinct(DOCTNMBR))
 
 ## export csv files for city ----
+
+# make directories for city summaries
+city_directory <- paste0("data_summaries/city/",municipality_focus,"/")
+ifelse(!dir.exists(city_directory), dir.create(city_directory), "Folder exists already")
+
 for(table_name in as.vector(names(data_summary[-1]))) {
-  write_csv(data_summary[[table_name]], file = paste0("data_summaries/city/",table_name, ".csv"))
+  write_csv(data_summary[[table_name]], file = paste0(city_directory, municipality_focus, "-", table_name, ".csv"))
 }
 ```
 
@@ -110,21 +122,21 @@ data_summary <- list(NULL)
 # crashes by year that resulted in a pedestrian fatality or severe injury
 data_summary[["crash_by_year"]] <- TOPS_data %>%
   filter(CNTYNAME %in% county_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   group_by(CNTYNAME, year, vulnerable_role, ped_inj_name) %>%
   summarise(count = n_distinct(DOCTNMBR))
 
 # crashes by race of pedestrian/bicyclist for focus year
 data_summary[["crash_by_race"]] <- TOPS_data %>%
   filter(CNTYNAME %in% county_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   group_by(CNTYNAME, vulnerable_role, ped_inj_name, vulnerable_race) %>%
   summarise(count = n_distinct(DOCTNMBR))
 
 # crashes by race of driver that resulted in a pedestrian fatality or severe injury
 data_summary[["crash_by_driver_race"]] <- TOPS_data %>%
   filter(CNTYNAME %in% county_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   mutate(driver_race = ifelse(ROLE1 %in% c("DR"), race_name1, ifelse(ROLE2 %in% c("DR"), race_name2, NA))) %>%
   group_by(CNTYNAME, year, vulnerable_role, ped_inj_name, driver_race) %>%
   summarise(count = n_distinct(DOCTNMBR))
@@ -132,7 +144,7 @@ data_summary[["crash_by_driver_race"]] <- TOPS_data %>%
 # crashes by age of pedestrian/bicyclist
 data_summary[["crash_by_age"]] <- TOPS_data %>%
   filter(CNTYNAME %in% county_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) %>%
   group_by(CNTYNAME, year, vulnerable_role, ped_inj_name, vulnerable_age) %>%
   summarise(count = n_distinct(DOCTNMBR))
@@ -140,7 +152,7 @@ data_summary[["crash_by_age"]] <- TOPS_data %>%
 # crashes by age of driver that resulted in a severe injury or fatality of a pedestrian/bicyclist
 data_summary[["crash_by_driver_age"]] <- TOPS_data %>%
   filter(CNTYNAME %in% county_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   mutate(driver_age = ifelse(ROLE1 %in% c("DR"), age1, ifelse(ROLE2 %in% c("DR"), age2, NA))) %>%
   group_by(CNTYNAME, year, vulnerable_role, ped_inj_name, driver_age) %>%
   summarise(count = n_distinct(DOCTNMBR))
@@ -148,7 +160,7 @@ data_summary[["crash_by_driver_age"]] <- TOPS_data %>%
 # crashes by sex of pedestrian/bicyclist
 data_summary[["crash_by_sex"]] <- TOPS_data %>%
   filter(CNTYNAME %in% county_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   mutate(vulnerable_sex = ifelse(ROLE1 %in% vuln_roles, SEX1, ifelse(ROLE2 %in% vuln_roles, SEX1, NA))) %>%
   group_by(CNTYNAME, year, vulnerable_role, ped_inj_name, vulnerable_sex) %>%
   summarise(count = n_distinct(DOCTNMBR))
@@ -156,15 +168,55 @@ data_summary[["crash_by_sex"]] <- TOPS_data %>%
 # crashes by sex of driver that resulted in a severe injury or fatality of a pedestrian/bicyclist
 data_summary[["crash_by_driver_sex"]] <- TOPS_data %>%
   filter(CNTYNAME %in% county_focus) %>%
-  filter(ped_inj %in% c("A", "K")) %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
   mutate(driver_sex = ifelse(ROLE1 %in% c("DR"), SEX1, ifelse(ROLE2 %in% c("DR"), SEX2, NA))) %>%
   group_by(CNTYNAME, year, vulnerable_role, ped_inj_name, driver_sex) %>%
   summarise(count = n_distinct(DOCTNMBR))
 
 ## export csv files for county ----
+
+# make directories for county summaries
+
+county_directory <- paste0("data_summaries/county/",county_focus,"/")
+ifelse(!dir.exists(county_directory), dir.create(county_directory), "Folder exists already")
+
+
 for(table_name in as.vector(names(data_summary[-1]))) {
-  write_csv(data_summary[[table_name]], file = paste0("data_summaries/county/",table_name, ".csv"))
+  write_csv(data_summary[[table_name]], file = paste0("data_summaries/county/", county_focus, "/", county_focus, "_", table_name, ".csv"))
 }
 ```
 
 
+## Make figures for county summaries
+```{r countysummaryfigures, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+data_summary[["crash_by_age"]] %>%
+  filter(vulnerable_age < 18,
+         year != 2025) %>%
+  group_by(year, ped_inj_name) %>%
+  summarise(count = sum(count)) %>%
+  ggplot() +
+  geom_col(aes(x = year,
+               y = count,
+               fill = ped_inj_name)) +
+  scale_fill_manual(values = injury_severity_pal(injury_severity %>% filter(code %in% injury_severy_focus) %>% pull(InjSevName))) +
+  labs(title = paste0("Pedestrian & bicyclists under 18yo killed or injured in ", str_to_title(county_focus), " county"),
+       x = "Year",
+       y = "Total crashes",
+       fill = "Injury Severity",
+       caption = paste0("crash data from UW TOPS lab - retrieved ",
+                        strftime(retrieve_date, format = "%m/%Y"),
+                        " per direction of the WisDOT Bureau of Transportation Safety")) +
+  theme(plot.caption = element_text(color = "grey"))
+ggsave(file = paste0(county_directory, county_focus, "_youth_crashes.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data %>%
+  filter(CNTYNAME %in% county_focus) %>%
+  filter(year == 2024) %>%
+  filter(ped_inj %in% "K") %>%
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) %>%
+  filter(vulnerable_age < 18)
+
+```
