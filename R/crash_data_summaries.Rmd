@@ -23,8 +23,6 @@ library(RColorBrewer)
 library(tidycensus)
 library(ggrepel)
 library(leaflet)
-county_focus <- c("DANE")
-municipality_focus <- c("MADISON")
 ```
 
 ## Load TOPS data
@@ -218,5 +216,90 @@ TOPS_data %>%
   filter(ped_inj %in% "K") %>%
   mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) %>%
   filter(vulnerable_age < 18)
+
+```
+
+## Make figures for statewide summaries
+```{r statesummary, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+TOPS_data %>%
+  filter(!is.na(vulnerable_role)) %>%
+  filter(vulnerable_role == "Pedestrian") %>%
+  mutate(driver_vehtype = ifelse(ROLE1 %in% c("DR"), VEHTYPE1, ifelse(ROLE2 %in% c("DR"), VEHTYPE2, NA))) %>%
+  filter(driver_vehtype %in% c("CAR", "SUV", "UT TRK")) %>%
+  group_by(vulnerable_role, ped_inj_name, driver_vehtype) %>%
+  summarise(count = n_distinct(DOCTNMBR)) %>%
+  pivot_wider(names_from = driver_vehtype, values_from = count) %>%
+  ungroup() %>%
+  mutate(total = (CAR + SUV + `UT TRK`)) %>%
+  mutate(car_percent = CAR/total * 100,
+         suv_percent = SUV/total * 100,
+         pickup_percent = `UT TRK`/total * 100) %>%
+  select(vulnerable_role, ped_inj_name, car_percent, suv_percent, pickup_percent) %>%
+  mutate(Car = car_percent, SUV = suv_percent, "Pickup Truck" = pickup_percent) %>%
+  pivot_longer(cols = c(Car, SUV, "Pickup Truck")) %>%
+  ggplot(aes(x = ped_inj_name,
+               y = value,
+               fill = name)) +
+  geom_col(position = position_stack()) +
+  geom_text(aes(label = paste0(round(value, 1), "%")),
+            position = position_stack(vjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1),
+        plot.caption = element_text(color = "grey")) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0))) +
+  labs(title = "Impact of type of vehicle on severity of injury",
+       subtitle = "Crashes statewide - Wisconsin",
+       y = "Percent of crashes",
+       x = "Severity of injury",
+       fill = "Type of vehicle",
+       caption = paste0("crash data from UW TOPS lab - retrieved ",
+                        strftime(retrieve_date, format = "%m/%Y"),
+                        " per direction of the WisDOT Bureau of Transportation Safety"))
+ggsave(file = paste0("figures/crash_summaries/state/", "VehType_InjSev.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+
+TOPS_data %>%
+  filter(!is.na(vulnerable_role)) %>%
+  filter(vulnerable_role == "Pedestrian") %>%
+  filter(ped_inj %in% injury_severy_focus) %>%
+  mutate(driver_vehtype = ifelse(ROLE1 %in% c("DR"), VEHTYPE1, ifelse(ROLE2 %in% c("DR"), VEHTYPE2, NA))) %>%
+  filter(driver_vehtype %in% c("CAR", "SUV", "UT TRK")) %>%
+  group_by(vulnerable_role, driver_vehtype, year) %>%
+  summarise(count = n_distinct(DOCTNMBR)) %>%
+  pivot_wider(names_from = driver_vehtype, values_from = count) %>%
+  ungroup() %>%
+  mutate(total = (CAR + SUV + `UT TRK`)) %>%
+  mutate(car_percent = CAR/total * 100,
+         suv_percent = SUV/total * 100,
+         pickup_percent = `UT TRK`/total * 100) %>%
+  select(year, vulnerable_role, car_percent, suv_percent, pickup_percent) %>%
+  pivot_longer(cols = c(car_percent, suv_percent, pickup_percent)) %>%
+  ggplot() +
+  geom_line(aes(x = as.double(as.character(year)),
+               y = value,
+               color = name))
+
+TOPS_data %>%
+  filter(!is.na(vulnerable_role)) %>%
+  filter(vulnerable_role == "Pedestrian") %>%
+  filter(ped_inj %in% "K") %>%
+  mutate(driver_vehtype = ifelse(ROLE1 %in% c("DR"), VEHTYPE1, ifelse(ROLE2 %in% c("DR"), VEHTYPE2, NA))) %>%
+  filter(driver_vehtype %in% c("CAR", "SUV", "UT TRK")) %>%
+  group_by(vulnerable_role, driver_vehtype, year) %>%
+  summarise(count = n_distinct(DOCTNMBR)) %>%
+  pivot_wider(names_from = driver_vehtype, values_from = count) %>%
+  ungroup() %>%
+  mutate(total = (CAR + SUV + `UT TRK`)) %>%
+  mutate(car_percent = CAR/total * 100,
+         suv_percent = SUV/total * 100,
+         pickup_percent = `UT TRK`/total * 100) %>%
+  select(year, vulnerable_role, car_percent, suv_percent, pickup_percent) %>%
+  pivot_longer(cols = c(car_percent, suv_percent, pickup_percent)) %>%
+  ggplot() +
+  geom_line(aes(x = as.double(as.character(year)),
+               y = value,
+               color = name))
 
 ```
