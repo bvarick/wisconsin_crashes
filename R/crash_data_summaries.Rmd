@@ -247,7 +247,7 @@ TOPS_data %>%
         plot.caption = element_text(color = "grey")) +
   scale_y_continuous(expand = expansion(mult = c(0, 0))) +
   labs(title = "Impact of type of vehicle on severity of injury",
-       subtitle = "Crashes statewide - Wisconsin",
+       subtitle = paste0("Crashes statewide - Wisconsin - 2017-", year(max(TOPS_data$date))),
        y = "Percent of crashes",
        x = "Severity of injury",
        fill = "Type of vehicle",
