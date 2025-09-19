@@ -86,7 +86,8 @@ TOPS_data <- TOPS_data %>% mutate(ped_inj = ifelse(ROLE1 %in% vuln_roles,
                                                    INJSVR1, 
                                                    ifelse(ROLE2 %in% vuln_roles, 
                                                           INJSVR2,
-                                                          NA)))
+                                                          NA))) %>%
+  mutate(ped_age = ifelse(ROLE1 %in% vuln_roles, age1, age2))
 
 TOPS_data <- left_join(TOPS_data, injury_severity %>% select(InjSevName, code), join_by(ped_inj == code)) %>% 
   mutate(InjSevName = factor(InjSevName, levels = injury_severity$InjSevName)) %>%
