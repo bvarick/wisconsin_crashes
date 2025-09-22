@@ -29,6 +29,8 @@ library(magick)
 library(rsvg)
 library(parallel)
 library(tidycensus)
+library(MASS)
+library(raster)
 ```
 
 
@@ -56,8 +58,9 @@ year_max <- max(year(TOPS_data_filtered$date))
 ```{r introCharts, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 ggplot() +
   geom_col(data = TOPS_data_filtered %>%
-             filter(year != year_max) %>%
-             filter(!is.na(vulnerable_role)) %>%
+#             filter(MUNINAME %in% "MILWAUKEE") %>%
+             filter(! year %in% c(year_max)) %>%
+             filter(! is.na(vulnerable_role)) %>%
              group_by(month, vulnerable_role) %>% 
              summarize(total = n()),
            aes(x = month,
@@ -65,6 +68,7 @@ ggplot() +
                fill = vulnerable_role),
            position = position_dodge()) +
   geom_line(data = TOPS_data_filtered %>%
+#             filter(MUNINAME %in% "MILWAUKEE") %>%
               filter(year == year_max) %>%
               filter(!is.na(vulnerable_role)) %>%
               group_by(month, vulnerable_role) %>% 
@@ -80,8 +84,8 @@ ggplot() +
   labs(title = paste0("Crashes involved pedestrians and bicyclists"),
        subtitle = paste0(str_to_title(focus_county), " County"),
        x = "Month",
-       y = "Average crashes per year",
-       fill = paste0("Yearly average\n", year_min, " - ", year_max - 1),
+       y = "Crashes per month",
+       fill = paste0("Average\n", year_min, " - ", year_max - 1),
        color = year_max,
        caption = paste0("crash data from UW TOPS lab - retrieved ",
                         strftime(retrieve_date, format = "%m/%Y"),
@@ -96,9 +100,10 @@ ggsave(filename = paste0("figures/MilWALKee_Walks/", "month_role.png"),
 
 ggplot() +
   geom_col(data = TOPS_data_filtered %>%
+#             filter(MUNINAME %in% "MILWAUKEE") %>%
              filter(vulnerable_role == "Pedestrian",
                     !is.na(ped_age)) %>%
-             filter(year != year_max) %>%
+             filter(! year %in% c(year_max)) %>%
              mutate(age = ifelse(ped_age <= 18, "child", "adult")) %>%
              group_by(month, age) %>% 
              summarize(total = n()/((year_max - 1) - year_min + 1)),
@@ -107,25 +112,26 @@ ggplot() +
                fill = age),
            position = position_dodge()) +
     geom_line(data = TOPS_data_filtered %>%
-              filter(year == year_max) %>%
-             filter(vulnerable_role == "Pedestrian",
-                    !is.na(ped_age)) %>%
-             mutate(age = ifelse(ped_age <= 18, "child", "adult")) %>%
-             group_by(month, age, year) %>% 
-             summarize(total = n()),
-            aes(x = month,
-                y = total,
-                color = age,
-                group = age),
-            linewidth = 1) +
+#                filter(MUNINAME %in% "MILWAUKEE") %>%
+                filter(year == year_max) %>%
+                filter(vulnerable_role == "Pedestrian",
+                       !is.na(ped_age)) %>%
+                mutate(age = ifelse(ped_age <= 18, "child", "adult")) %>%
+                group_by(month, age, year) %>% 
+                summarize(total = n()),
+              aes(x = month,
+                  y = total,
+                  color = age,
+                  group = age),
+              linewidth = 1) +
   scale_y_continuous(expand = expansion(mult = c(0,0.1))) +
   scale_fill_manual(values = c("deeppink1", "darkgoldenrod1")) +
   scale_color_manual(values = c("deeppink3", "darkgoldenrod3")) +
   labs(title = paste0("Crashes involved pedestrians"),
        subtitle = paste0(str_to_title(focus_county), " County"),
        x = "Month",
-       y = "Crashes",
-       fill = paste0("Yearly average\n", year_min, " - ", year_max - 1),
+       y = "Crashes per month",
+       fill = paste0("Average\n", year_min, " - ", year_max - 1),
        color = year_max,
        caption = paste0("crash data from UW TOPS lab - retrieved ",
                         strftime(retrieve_date, format = "%m/%Y"),
@@ -140,7 +146,10 @@ ggsave(filename = paste0("figures/MilWALKee_Walks/", "month_age.png"),
 
 ggplot(data = TOPS_data_filtered %>%
   filter(vulnerable_role == "Pedestrian",
-         month(date) <= 8) %>%
+         month(date) <= 8,
+         ) %>%
+#    filter(ped_age < 18,
+#          MUNINAME %in% "MILWAUKEE") %>%
   group_by(year) %>% 
   summarize(total = n())) +
   geom_col(aes(x = year,
@@ -150,7 +159,7 @@ ggplot(data = TOPS_data_filtered %>%
   labs(title = paste0("Crashes involved pedestrians"),
        subtitle = paste0(str_to_title(focus_county), " County | ", "January - August"),
        x = NULL,
-       y = "Crashes",
+       y = "Crashes per year",
        caption = paste0("crash data from UW TOPS lab - retrieved ",
                         strftime(retrieve_date, format = "%m/%Y"),
                         "\nper direction of the WisDOT Bureau of Transportation Safety")) +
@@ -161,6 +170,35 @@ ggsave(filename = paste0("figures/MilWALKee_Walks/", "ped_years.png"),
        width = 11,
        units = "in",
        create.dir = TRUE)
+
+ggplot(data = TOPS_data_filtered %>%
+         filter(vulnerable_role == "Pedestrian",
+                month(date) <= 8) %>%
+         mutate(mke_city = factor(ifelse(MUNINAME %in% "MILWAUKEE", "City of Milwaukee", "Other municipalities"),
+                                  levels = c("Other municipalities", "City of Milwaukee"))) %>%
+         group_by(year, mke_city) %>% 
+         summarize(total = n())) +
+  geom_col(aes(x = year,
+               y = total,
+               fill = mke_city),
+           position = position_dodge()) +
+  scale_y_continuous(expand = expansion(mult = c(0,0.1))) +
+  labs(title = paste0("Crashes involved pedestrians"),
+       subtitle = paste0(str_to_title(focus_county), " County | ", "January - August"),
+       x = NULL,
+       y = "Crashes",
+       fill = NULL,
+       caption = paste0("crash data from UW TOPS lab - retrieved ",
+                        strftime(retrieve_date, format = "%m/%Y"),
+                        "\nper direction of the WisDOT Bureau of Transportation Safety")) +
+      theme(plot.caption = element_text(color = "grey"))
+ggsave(filename = paste0("figures/MilWALKee_Walks/", "ped_years_MKEcity.png"),
+       device = png,
+       height = 8.5,
+       width = 11,
+       units = "in",
+       create.dir = TRUE)
+
 ```
 
 ## Milwaukee maps
@@ -182,30 +220,24 @@ county_populations <- get_estimates(geography = "county",
   filter(variable == "POPESTIMATE") %>%
   mutate(County = str_to_upper(str_replace(NAME, " County, Wisconsin", "")))
 county_populations <- st_transform(county_populations, crs = 4326) %>% filter(County %in% focus_county)
-census_tract_populations <- st_transform(get_decennial(
-  year = 2020,
-  geography = "block",
-  variables = "P1_001N",
-  state = "WI",
-  county = focus_county,
-  geometry = TRUE
-), crs = 4326)
-
-census_tract_crashes <- st_join(census_tract_populations, st_as_sf(TOPS_data_filtered %>% filter(!is.na(latitude)), coords = c("longitude", "latitude"), crs = 4326), join = st_contains) %>%
-  group_by(GEOID) %>%
-  summarise(count = n(), .groups = 'drop')
 
 hexgrid <- rowid_to_column(st_transform(st_as_sf(st_make_grid(st_transform(county_populations, crs = 32616),
                cellsize = 3000,
                what = 'polygons',
                square = FALSE
                )), crs = 4326), "ID")
-
-hex_crashes <- st_join(hexgrid, st_as_sf(TOPS_data_filtered %>% filter(!is.na(latitude)), coords = c("longitude", "latitude"), crs = 4326), join = st_contains) %>%
+yearsforprior <- 8
+hex_crashes <- st_join(hexgrid, 
+                       st_as_sf(TOPS_data_filtered %>% 
+                                  filter(vulnerable_role %in% "Pedestrian") %>% 
+                                  filter(!is.na(latitude)), 
+                                coords = c("longitude", "latitude"), 
+                                crs = 4326), 
+                       join = st_contains) %>%
   filter(!is.na(year)) %>%
-  filter(date >= (max(date) - (365 * 5))) %>%
+  filter(date >= (max(date) - (365 * yearsforprior))) %>%
   mutate(lastyear = ifelse((date <= max(date) - 365),
-                "priorfive",
+                "prior",
                 "lastyear")) %>%
   group_by(ID, lastyear) %>%
   summarise(count = n(), .groups = 'drop') %>%
@@ -217,9 +249,44 @@ hex_crashes <- st_join(hexgrid, st_as_sf(TOPS_data_filtered %>% filter(!is.na(la
 hex_crashes <- st_as_sf(left_join(hexgrid, hex_crashes), crs = 4326)
 
 hex_crashes <- hex_crashes %>%
-  mutate(lastyearchange = (lastyear - priorfive/5)/(priorfive/5))
+  mutate(lastyearchange = (lastyear - prior/yearsforprior)/(prior/yearsforprior))
 
 hex_crashes_points <- st_centroid(hex_crashes)
+
+#hex_small_crashes
+
+hexgrid_small <- rowid_to_column(st_transform(st_as_sf(st_make_grid(st_transform(county_populations, crs = 32616),
+               cellsize = 500,
+               what = 'polygons',
+               square = FALSE
+               )), crs = 4326), "ID")
+
+hex_crashes_small <- st_join(hexgrid_small, 
+                             st_as_sf(TOPS_data_filtered %>% 
+                                        filter(vulnerable_role %in% "Pedestrian") %>%
+                                        filter(!is.na(latitude)), 
+                                      coords = c("longitude", "latitude"), 
+                                      crs = 4326), 
+                             join = st_contains) %>%
+  filter(!is.na(year)) %>%
+  filter(date >= (max(date) - (365 * yearsforprior))) %>%
+  mutate(lastyear = ifelse((date <= max(date) - 365),
+                "prior",
+                "lastyear")) %>%
+  group_by(ID, lastyear) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  st_drop_geometry() %>%
+  pivot_wider(id_cols = ID, names_from = lastyear, values_from = count) %>%
+  mutate(across(-ID, ~ replace_na(., 0))) %>%
+  mutate(total = rowSums(dplyr::select(., -ID), na.rm = TRUE))
+
+hex_crashes_small <- st_as_sf(left_join(hexgrid_small, hex_crashes_small), crs = 4326)
+
+hex_crashes_small <- hex_crashes_small %>%
+  mutate(lastyearchange = (lastyear - prior/yearsforprior)/(prior/yearsforprior))
+
+hex_crashes_small_points <- st_centroid(hex_crashes_small)
+
 
 ```
 
@@ -230,7 +297,7 @@ bbox <- c(left = as.double(bbox[1]),
           bottom = as.double(bbox[2]), 
           right = as.double(bbox[3]), 
           top = as.double(bbox[4]))
-basemap <- get_stadiamap(bbox = bbox, zoom = 13, maptype = "stamen_toner_lite")
+basemap <- get_stadiamap(bbox = bbox, zoom = 12, maptype = "stamen_toner_lite")
 
 # generate map with bubbles
 ggmap(basemap) +
@@ -247,7 +314,7 @@ ggmap(basemap) +
     x = NULL,
     y = NULL,
     size = paste0("Total crashes"),
-    fill = "last 12 months\ncompared to previous") +
+    fill = paste0("last 12 months\ncompared to previous\n", yearsforprior, " years")) +
   theme(axis.text=element_blank(),
         axis.ticks=element_blank(),
         plot.caption = element_text(color = "grey", size = 8)) +
@@ -277,6 +344,168 @@ ggsave(file = paste0("figures/MilWALKee_Walks/",
        width = 11,
        units = "in",
        create.dir = TRUE)
+
+ggmap(basemap) +
+  labs(title = paste0("Crashes between cars and pedestrians"),
+    subtitle = paste0(str_to_title(focus_county),
+                      " County | ",
+                      min(year(TOPS_data$date), na.rm = TRUE), 
+                      " - ", 
+                      max(year(TOPS_data$date), na.rm = TRUE)),
+    caption = paste0("crash data from UW TOPS lab - retrieved ",
+                     strftime(retrieve_date, format = "%m/%Y"),
+                     "\nper direction of the WisDOT Bureau of Transportation Safety",
+                     "\nbasemap from StadiaMaps and OpenStreetMap Contributers"),
+    x = NULL,
+    y = NULL,
+    size = paste0("Total crashes"),
+    fill = "Crashes in the last 12 months\ncompared to previous average") +
+  theme(axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        plot.caption = element_text(color = "grey", size = 8)) +
+  # add crash locations
+  geom_sf(data = hex_crashes %>% mutate(lastyearchange = (lastyear - prior/yearsforprior)),
+          inherit.aes = FALSE,
+          aes(fill = lastyearchange),
+          alpha = 0.5) +
+  scale_size_area() +
+  scale_fill_gradient2(
+    low = "darkgreen",
+    mid = "white",
+    high = "red",
+    midpoint = 0,
+#    limits = c(-2, 2),
+#    oob = scales::squish
+  )
+
+ggsave(file = paste0("figures/MilWALKee_Walks/",
+                     "milwaukee_map_crashchange.png"),
+       device = png,
+       height = 8.5,
+       width = 11,
+       units = "in",
+       create.dir = TRUE)
+
+highlighted_areas <- hex_crashes %>% 
+  mutate(lastyearchange = (lastyear - prior/yearsforprior)) %>% 
+  filter(prior > 100,
+         (lastyearchange > 5 |
+            lastyearchange < -1)) %>% pull(ID)
+
+ggmap(basemap) +
+  labs(title = paste0("Crashes between cars and pedestrians\nselect areas of the county"),
+    subtitle = paste0(str_to_title(focus_county),
+                      " County | ",
+                      min(year(TOPS_data$date), na.rm = TRUE), 
+                      " - ", 
+                      max(year(TOPS_data$date), na.rm = TRUE)),
+    caption = paste0("crash data from UW TOPS lab - retrieved ",
+                     strftime(retrieve_date, format = "%m/%Y"),
+                     "\nper direction of the WisDOT Bureau of Transportation Safety",
+                     "\nbasemap from StadiaMaps and OpenStreetMap Contributers"),
+    x = NULL,
+    y = NULL,
+    size = paste0("Total crashes"),
+    fill = "last 12 months\ncompared to previous") +
+  theme(axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        plot.caption = element_text(color = "grey", size = 8)) +
+  # add crash locations
+  geom_sf(data = hex_crashes %>% filter(ID %in% highlighted_areas),
+          inherit.aes = FALSE,
+          aes(fill = lastyearchange),
+          alpha = 0.5) +
+  geom_sf_text(data = hex_crashes_points %>% filter(ID %in% highlighted_areas),
+                inherit.aes = FALSE,
+                aes(label = paste0(ifelse(lastyearchange > 0, "+",""),round(lastyearchange * 100, 0), "%")),
+               size = 3) +
+  scale_size_area() +
+  scale_fill_gradient2(
+    low = "darkgreen",
+    mid = "white",
+    high = "red",
+    midpoint = 0,
+    limits = c(-2, 2),
+    oob = scales::squish,
+    labels = scales::percent
+  )
+
+ggsave(file = paste0("figures/MilWALKee_Walks/",
+                     "milwaukee_map_highlighted.png"),
+       device = png,
+       height = 8.5,
+       width = 11,
+       units = "in",
+       create.dir = TRUE)
+
+bbox <- st_bbox(st_union(hexgrid %>% filter(ID %in% c(78, 85, 94))))
+bbox <- c(left = as.double(bbox[1]), 
+          bottom = as.double(bbox[2]), 
+          right = as.double(bbox[3]), 
+          top = as.double(bbox[4]))
+basemap <- get_stadiamap(bbox = bbox, zoom = 14, maptype = "stamen_toner_lite")
+
+# Map of high increase areas
+ggmap(basemap) +
+  labs(title = paste0("Crashes between cars and pedestrians"),
+    subtitle = paste0(str_to_title(focus_county),
+                      " County | ",
+                      min(year(TOPS_data$date), na.rm = TRUE), 
+                      " - ", 
+                      max(year(TOPS_data$date), na.rm = TRUE)),
+    caption = paste0("crash data from UW TOPS lab - retrieved ",
+                     strftime(retrieve_date, format = "%m/%Y"),
+                     "\nper direction of the WisDOT Bureau of Transportation Safety",
+                     "\nbasemap from StadiaMaps and OpenStreetMap Contributers"),
+    x = NULL,
+    y = NULL,
+    size = paste0("Total crashes"),
+    fill = paste0("last 12 months\ncompared to previous\n", yearsforprior, " years")) +
+  theme(axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        plot.caption = element_text(color = "grey", size = 8)) +
+#add hexagons
+  new_scale_fill() +
+  geom_sf(data = hex_crashes_small %>% mutate(lastyearchange = (lastyear - prior/yearsforprior)),
+          inherit.aes = FALSE,
+          aes(fill = lastyearchange),
+          alpha = 0.5) +
+  scale_size_area() +
+  scale_fill_gradient2(
+    low = "darkgreen",
+    mid = "white",
+    high = "red",
+    midpoint = 0,
+#    limits = c(-2, 2),
+#    oob = scales::squish
+  name = "Crashes last year compared to previous average") +
+  # add crash locations
+  new_scale_fill() +
+  geom_point(data = TOPS_data_filtered %>% 
+               filter(date >= max(TOPS_data_filtered$date) - 365) %>%
+               #filter(ped_inj %in% c("K", "A")) %>%
+               filter(vulnerable_role %in% "Pedestrian") %>%
+               filter(longitude >= as.double(bbox[1]),
+                      latitude >= as.double(bbox[2]),
+                      longitude <= as.double(bbox[3]),
+                      latitude <= as.double(bbox[4])) %>%
+               arrange(ped_inj_name),
+             aes(x = longitude,
+                 y = latitude,
+                 fill = ped_inj_name),
+             shape = 23,
+             size = 3) +
+  scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = "Crash Severity")
+
+ggsave(file = paste0("figures/MilWALKee_Walks/",
+                     "milwaukee_map_zoomchange.png"),
+       device = png,
+       height = 8.5,
+       width = 11,
+       units = "in",
+       create.dir = TRUE)
+
+
 ```
 
 
@@ -300,7 +529,7 @@ TOPS_data <- TOPS_data %>% mutate(trickortreat = ifelse(date %in% trickortreatda
 ggplot(data = TOPS_data_filtered %>% 
 #         filter(ped_inj %in% c("K", "A", "B")) %>%
 #  filter(ped_age <=18) %>%
-#  filter(vulnerable_role == "Pedestrian") %>%
+  filter(vulnerable_role == "Pedestrian") %>%
   mutate(mday = mday(date)) %>%
   mutate(date_yearagnostic = ymd(paste("2025", month, mday))) %>%
   group_by(date_yearagnostic, year, trickortreat) %>% 
@@ -309,40 +538,55 @@ ggplot(data = TOPS_data_filtered %>%
                y = total,
                fill = trickortreat)) +
   scale_x_date(minor_breaks = "month", date_labels = "%b", expand = expansion(mult = c(0,0))) +
+  scale_y_continuous(breaks = seq(0, 9, 3), labels = c(0, 3, 6, "")) +
   scale_fill_manual(values = c("black", "orange")) +
   facet_grid(year ~ .) +
-  labs(title = paste0("Crashes involved pedestrians - Halloween"),
+  labs(title = paste0("Car crashes involving pedestrians - Halloween"),
        subtitle = paste0(str_to_title(focus_county), " County | ", year_min, " - ", year_max),
        x = NULL,
-       y = "Crashes",
+       y = "Crashes per day",
+       fill = "Days with\nTrick-or-Treating",
+       caption = paste0("crash data from UW TOPS lab - retrieved ",
+                        strftime(retrieve_date, format = "%m/%Y"),
+                        "\nper direction of the WisDOT Bureau of Transportation Safety")) +
+      theme(plot.caption = element_text(color = "grey"))
+ggsave(filename = paste0("figures/MilWALKee_Walks/", "halloween.png"),
+       device = png,
+       height = 8.5,
+       width = 11,
+       units = "in",
+       create.dir = TRUE)
+
+ggplot(data = TOPS_data_filtered %>% 
+#         filter(ped_inj %in% c("K", "A", "B")) %>%
+#  filter(ped_age <=18) %>%
+  mutate(wday = wday(date, label = TRUE)) %>%
+  filter(wday(date) %in% c(1, 7)) %>%
+  filter(vulnerable_role == "Pedestrian") %>%
+  group_by(date, wday, trickortreat) %>% 
+  summarize(total = n()) %>%
+  group_by(wday, trickortreat) %>%
+  summarize(average = mean(total, na.rm = TRUE))) +
+  geom_col(aes(x = wday,
+               y = average,
+               fill = trickortreat),
+           position = position_dodge()) +
+  scale_fill_manual(values = c("black", "orange")) +
+  labs(title = paste0("Car crashes involving pedestrians - Halloween"),
+       subtitle = paste0(str_to_title(focus_county), " County | ", year_min, " - ", year_max),
+       x = NULL,
+       y = "Crashes per day",
+       fill = "Days with\nTrick-or-Treating",
        caption = paste0("crash data from UW TOPS lab - retrieved ",
                         strftime(retrieve_date, format = "%m/%Y"),
                         "\nper direction of the WisDOT Bureau of Transportation Safety")) +
       theme(plot.caption = element_text(color = "grey"))
 
-
-ggplot(data = TOPS_data_filtered %>% 
-    #     filter(ped_inj %in% c("K", "A", "B")) %>%
-         mutate(age = ifelse(ped_age <= 18, "child", "adult"))) +
-  geom_bar(aes(x = month,
-               fill = age),
-           position = "fill")
-
-ggplot(data = TOPS_data_filtered %>% 
-#  filter(ped_age <=18) %>%
-#  filter(vulnerable_role == "Pedestrian") %>%
-  mutate(age = ifelse(ped_age <= 18, "child", "adult")) %>%
-  mutate(date_yearagnostic = ymd(paste("2025", month, mday(date)))) %>%
-  group_by(date_yearagnostic, year, age, trickortreat) %>% 
-  summarize(total = n())) +
-#  geom_vline(aes(xintercept = ymd("2025-10-31")),
-#             linetype = "dashed",
-#             alpha = 0.5) +
-  geom_col(aes(x = date_yearagnostic,
-               y = total,
-               fill = trickortreat)) +
-  scale_x_date(minor_breaks = "month", date_labels = "%b", expand = expansion(mult = c(0,0))) +
-  scale_fill_manual(values = c("black", "orange")) +
-  facet_grid(year ~ .)
+ggsave(filename = paste0("figures/MilWALKee_Walks/", "halloween_wday.png"),
+       device = png,
+       height = 8.5,
+       width = 11,
+       units = "in",
+       create.dir = TRUE)
 
 ```
