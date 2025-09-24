@@ -78,7 +78,7 @@ ggplot() +
   scale_y_continuous(expand = expansion(mult = c(0,0.1))) +
   scale_fill_manual(values = c("sienna3", "deepskyblue3")) +
   scale_color_manual(values = c("sienna4", "deepskyblue4")) +
-  labs(title = paste0("Crashes involved pedestrians and bicyclists"),
+  labs(title = paste0("Car crashes involving pedestrians & bicyclists"),
        subtitle = paste0(str_to_title(focus_county), " County"),
        x = "Month",
        y = "Crashes per month",
@@ -124,7 +124,7 @@ ggplot() +
   scale_y_continuous(expand = expansion(mult = c(0,0.1))) +
   scale_fill_manual(values = c("deeppink1", "darkgoldenrod1")) +
   scale_color_manual(values = c("deeppink3", "darkgoldenrod3")) +
-  labs(title = paste0("Crashes involved pedestrians"),
+  labs(title = paste0("Car crashes involving pedestrians"),
        subtitle = paste0(str_to_title(focus_county), " County"),
        x = "Month",
        y = "Crashes per month",
@@ -154,7 +154,7 @@ ggplot(data = TOPS_data_filtered %>%
                y = total),
            fill = "lightblue4") +
   scale_y_continuous(expand = expansion(mult = c(0,0.1))) +
-  labs(title = paste0("Crashes involved pedestrians & bicyclists"),
+  labs(title = paste0("Car crashes involving pedestrians & bicyclists"),
        subtitle = paste0(str_to_title(focus_county), " County | ", "January - August"),
        x = NULL,
        y = "Crashes per year",
@@ -183,7 +183,7 @@ ggplot(data = TOPS_data_filtered %>%
            position = position_dodge()) +
   scale_y_continuous(expand = expansion(mult = c(0,0.1))) +
   scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = "Injury severity") +
-labs(title = paste0("Crashes involved pedestrians & bicyclists - fatal and serious injuries"),
+labs(title = paste0("Car crashes involving pedestrians & bicyclists - fatal and serious injuries"),
      subtitle = paste0(str_to_title(focus_county), " County | ", "January - August"),
      x = NULL,
      y = "Crashes per year",
@@ -212,7 +212,7 @@ ggplot(data = TOPS_data_filtered %>%
                fill = mke_city),
            position = position_dodge()) +
   scale_y_continuous(expand = expansion(mult = c(0,0.1))) +
-  labs(title = paste0("Crashes involved pedestrians - fatal and severe injuries"),
+  labs(title = paste0("Car crashes involving pedestrians - fatal and severe injuries"),
        subtitle = paste0(str_to_title(focus_county), " County | ", "January - August"),
        x = NULL,
        y = "Crashes",
@@ -246,7 +246,7 @@ ggplot(data = TOPS_data_filtered %>%
   scale_y_continuous(expand = expansion(mult = c(0,0.1))) +
   scale_color_brewer(palette = "Set1") +
   scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = "Injury severity") +
-labs(title = paste0("Crashes involved pedestrians & bicyclists - fatal and serious injuries"),
+labs(title = paste0("Car crashes involving pedestrians & bicyclists - fatal and serious injuries"),
      subtitle = paste0(str_to_title(focus_county), " County"),
      x = NULL,
      y = "Cumulative crashes",
@@ -385,7 +385,7 @@ basemap <- get_stadiamap(bbox = bbox, zoom = 12, maptype = "stamen_toner_lite")
 
 # generate map with bubbles
 ggmap(basemap) +
-  labs(title = paste0("Crashes between cars and pedestrians"),
+  labs(title = paste0("Car crashes involving pedestrians"),
     subtitle = paste0(str_to_title(focus_county),
                       " County | ",
                       year(min(TOPS_data_filtered$date, na.rm = TRUE)),
@@ -430,7 +430,7 @@ ggsave(file = paste0("figures/MilWALKee_Walks/",
        create.dir = TRUE)
 
 ggmap(basemap) +
-  labs(title = paste0("Crashes between cars and pedestrians"),
+  labs(title = paste0("Car crashes involving pedestrians"),
     subtitle = paste0(str_to_title(focus_county),
                       " County | ",
                       previousyearstring),
@@ -476,7 +476,7 @@ highlighted_areas <- hex_crashes %>%
 highlighted_areas <- c(62, 69, 78, 85)
 
 ggmap(basemap) +
-  labs(title = paste0("Crashes between cars and pedestrians\nselect areas of the county"),
+  labs(title = paste0("Car crashes involving pedestrians"),
     subtitle = paste0(str_to_title(focus_county),
                       " County | ",
                       min(year(TOPS_data$date), na.rm = TRUE), 
@@ -489,7 +489,7 @@ ggmap(basemap) +
     x = NULL,
     y = NULL,
     size = paste0("Total crashes"),
-    fill = "last 12 months\ncompared to previous") +
+    fill = "last year\ncompared to previous") +
   theme(axis.text=element_blank(),
         axis.ticks=element_blank(),
         plot.caption = element_text(color = "grey", size = 8)) +
@@ -530,7 +530,7 @@ basemap <- get_stadiamap(bbox = bbox, zoom = 14, maptype = "stamen_toner_lite")
 
 # Map of high increase areas
 ggmap(basemap) +
-  labs(title = paste0("Crashes between cars and pedestrians"),
+  labs(title = paste0("Car crashes involving pedestrians"),
     subtitle = paste0(str_to_title(focus_county),
                       " County | ",
                       min(year(TOPS_data$date), na.rm = TRUE), 
@@ -579,7 +579,7 @@ ggmap(basemap) +
                  fill = ped_inj_name),
              shape = 23,
              size = 3) +
-  scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = paste0("Crashes ", previousyearstring)) + geom_sf(data = projects_2023, inherit.aes = FALSE)
+  scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = paste0("Crashes ", previousyearstring))# + geom_sf(data = projects_2023, inherit.aes = FALSE)
 
 ggsave(file = paste0("figures/MilWALKee_Walks/",
                      "milwaukee_map_zoomchange.png"),
@@ -589,6 +589,23 @@ ggsave(file = paste0("figures/MilWALKee_Walks/",
        units = "in",
        create.dir = TRUE)
 
+## compare crashes in area
+nrow(TOPS_data_filtered %>% 
+               filter(date > max(TOPS_data_filtered$date) - 365) %>%
+               filter(ped_inj %in% c("K", "A")) %>%
+               filter(vulnerable_role %in% "Pedestrian") %>%
+               filter(longitude >= as.double(bbox[1]),
+                      latitude >= as.double(bbox[2]),
+                      longitude <= as.double(bbox[3]),
+                      latitude <= as.double(bbox[4])))
+nrow(TOPS_data_filtered %>% 
+               filter(date > (max(TOPS_data_filtered$date) - 365 * (yearsforprior + 1))) %>%
+               filter(ped_inj %in% c("K", "A")) %>%
+               filter(vulnerable_role %in% "Pedestrian") %>%
+               filter(longitude >= as.double(bbox[1]),
+                      latitude >= as.double(bbox[2]),
+                      longitude <= as.double(bbox[3]),
+                      latitude <= as.double(bbox[4])))/(yearsforprior + 1)
 ##highland ave
 
 bbox <- c(left = -87.967, 
