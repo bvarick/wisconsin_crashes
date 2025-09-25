@@ -707,8 +707,8 @@ TOPS_data <- TOPS_data %>% mutate(trickortreat = ifelse(date %in% trickortreatda
 
 ```
 
-## explore graphs
-```{r exploreGraphs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+## Halloween
+```{r exploreHalloween, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 ggplot(data = TOPS_data_filtered %>% 
 #         filter(ped_inj %in% c("K", "A", "B")) %>%
 #  filter(ped_age <=18) %>%
@@ -771,5 +771,44 @@ ggsave(filename = paste0("figures/MilWALKee_Walks/", "halloween_wday.png"),
        width = 11,
        units = "in",
        create.dir = TRUE)
+
+```
+
+## Trucks
+```{r exploreTrucks, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+TOPS_data_filtered %>% 
+  filter(ped_age < 18) %>%
+  filter(nonvuln_vehicletype != "Other") %>%
+  filter(vulnerable_role == "Pedestrian") %>%
+  group_by(ped_inj_name, nonvuln_vehicletype) %>%
+  summarise(total = n()) %>%
+  group_by(nonvuln_vehicletype) %>%
+  mutate(percent = total/sum(total),
+         cumpercent = cumsum(total)/sum(total)) %>%
+  ggplot(aes(x = nonvuln_vehicletype,
+               y = percent,
+               fill = ped_inj_name)) +
+  geom_col() +
+  geom_label(aes(label = paste0(round(percent * 100, 1), "%"),
+                fill = ped_inj_name),
+                position = position_stack(vjust = 0.5)) +
+  scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = "Injury severity") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = paste0("Car crashes involving pedestrians - Children"),
+       subtitle = paste0(str_to_title(focus_county), " County | ", year_min, " - ", year_max),
+       x = NULL,
+       y = "Percent of crashes",
+       caption = paste0("crash data from UW TOPS lab - retrieved ",
+                        strftime(retrieve_date, format = "%m/%Y"),
+                        "\nper direction of the WisDOT Bureau of Transportation Safety")) +
+      theme(plot.caption = element_text(color = "grey"))
+ggsave(filename = paste0("figures/MilWALKee_Walks/", "trucks_injsev.png"),
+       device = png,
+       height = 8.5,
+       width = 11,
+       units = "in",
+       create.dir = TRUE)
+
+
 
 ```

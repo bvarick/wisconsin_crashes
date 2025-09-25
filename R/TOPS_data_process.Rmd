@@ -106,7 +106,7 @@ TOPS_data <- TOPS_data %>% mutate(vulnerable_role = ifelse(ROLE1 %in% bike_roles
                                                                      NA)))
 ```
 
-## Add race names to TOPS data
+## Add race data to TOPS data
 ```{r TOPSrace, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 race <- data.frame(race_name = c("Asian", "Black", "Indian","Hispanic","White"), 
                    code = c("A", "B", "I", "H", "W"))
@@ -118,6 +118,30 @@ TOPS_data <- TOPS_data %>% mutate(vulnerable_race = ifelse(ROLE1 %in% vuln_roles
                                                    ifelse(ROLE2 %in% vuln_roles, 
                                                           race_name2,
                                                           NA)))
+```
+
+## Add vehicle type
+```{r TOPSvehicletype, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+trucksuv <- c("SUV", "UT TRK")
+car <- c("CAR")
+# definitions: https://transportal.cee.wisc.edu/documents/applications/crash-data/advanced/TOPS%20DT4000%20Crash%20Data%20Elements%20and%20Attributes_20250604.pdf
+
+TOPS_data <- TOPS_data %>% 
+  mutate(nonvuln_vehicletype = ifelse(ROLE1 %in% vuln_roles, 
+                                      ifelse(VEHTYPE2 %in% trucksuv, 
+                                             "Truck/SUV",
+                                             ifelse(VEHTYPE2 %in% car, 
+                                                    "Car", 
+                                                    "Other")
+                                      ), 
+                                      ifelse(VEHTYPE1 %in% trucksuv, 
+                                             "Truck/SUV",
+                                             ifelse(VEHTYPE1 %in% car, 
+                                                    "Car", 
+                                                    "Other")
+                                      )
+  )
+  )
 ```
 
 ## Save resulting data table as an Rda file for use in other documents
