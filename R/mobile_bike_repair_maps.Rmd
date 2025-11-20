@@ -1,0 +1,84 @@
+---
+title: "mobile_bike_repair_maps"
+output: html_document
+---
+
+## Libraries
+```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+date()
+rm(list=ls())
+library(tidyverse)
+library(ggmap)
+library(sf)
+library(osrm)
+library(smoothr)
+library(ggnewscale)
+library(RColorBrewer)
+library(magick)
+library(rsvg)
+```
+
+## Load repair event location data
+```{r repaireventlocations, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+
+MKE_MBR_sites <- st_read(dsn = "data/MBR/2025_MKE_MBR_sites.kml")
+MKE_MBR_sites <- MKE_MBR_sites |> 
+  mutate(long = st_coordinates(geometry)[,1],
+         lat = st_coordinates(geometry)[,2])
+
+```
+
+
+## Load API keys from StadiaMaps and the census
+```{r APIkeys, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+# register stadia API key ----
+register_stadiamaps(key = substr(read_file(file = "api_keys/stadia_api_key"), 1, 36))
+#options(ggmap.file_drawer = "basemaps")
+# dir.create(file_drawer(), recursive = TRUE, showWarnings = FALSE)
+# saveRDS(list(), file_drawer("index.rds"))
+#readRDS(file_drawer("index.rds"))
+#file_drawer("index.rds")
+
+# load census api key ----
+#census_api_key(key = substr(read_file(file = "api_keys/census_api_key"), 1, 40))
+```
+
+
+## create maps
+```{r createmaps, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+
+# create bounding box from school, 5km away.
+bbox <- st_bbox(st_transform(st_buffer(MKE_MBR_sites %>% pull(geometry), dist = 500), crs = 4326))
+bbox <- c(left = as.double(bbox[1]), 
+          bottom = as.double(bbox[2]), 
+          right = as.double(bbox[3]), 
+          top = as.double(bbox[4]))
+
+#get basemap
+basemap <- get_stadiamap(bbox = bbox, zoom = 13, maptype = "stamen_toner_lite")
+
+# generate map
+ggmap(basemap) +
+  labs(title = "Mobile bike repair events in Milwaukee - 2025",
+    caption = paste0("basemap from StadiaMaps and OpenStreetMap Contributers"),
+    x = NULL,
+    y = NULL) +
+  theme(axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        plot.caption = element_text(color = "grey")) +
+  geom_point(data = MKE_MBR_sites,
+             aes(x = long,
+                 y = lat),
+             shape = 23,
+             color = "black",
+             fill = "aquamarine4",
+             size = 5)
+
+ggsave(file = "figures/MBR/2025-repair-events.png",
+       device = png,
+       height = 8.5,
+       width = 11,
+       dpi = 600,
+       units = "in",
+       create.dir = TRUE)
+```
