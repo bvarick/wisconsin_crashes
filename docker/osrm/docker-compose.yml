@@ -1,4 +1,5 @@
 ---
+name: wisconsin_crashes
 services:
     osrm-backend-foot:
         container_name: osrm-backend-foot
