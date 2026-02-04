@@ -128,7 +128,10 @@ if(str_to_lower(school_type_focus) == "all") {
 # set which school types to generate figures for
 district_focus <- run_parameters$district_focus
 if(str_to_lower(district_focus) == "all") {
-  district_focus <- unique(WI_schools |> pull(DISTRICT))
+  district_focus <- WI_schools |> 
+    filter(str_to_upper(COUNTY) %in% county_focus) |> 
+    pull(DISTRICT) |> 
+    unique()
 }
 
 school_number <- length(unique(WI_schools |> filter(str_to_upper(COUNTY) %in% county_focus,  
@@ -322,7 +325,8 @@ generate_school_maps <- function(district) {
     walk_boundary_poly <- osrmIsodistance(
       loc = school_data |> pull(SHAPE),
       breaks = c(walk_boundary_m),
-      n = 5000) |> 
+      n = 2000) |> 
+      st_make_valid() |> 
       fill_holes(units::set_units(1, km^2))
     
     # create bounding box from school, 5km away.
@@ -427,7 +431,7 @@ generate_school_maps <- function(district) {
                     inherit.aes = FALSE,
                     mapping = aes(label = paste(SCHOOL, "School")),
                     nudge_y = 0.0015,
-                    label.size = 0.04,
+                    linewidth = 0.04,
                     size = 2) +
       annotation_raster(bikefed_logo,
                         # Position adjustments here using plot_box$max/min/range
@@ -454,7 +458,8 @@ generate_school_maps <- function(district) {
                      y = latitude,
                      fill = ped_inj_name),
                  shape = 23,
-                 size = 3) +
+                 size = 3,
+                 alpha = 0.8) +
       scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = "Crash Severity")
         
     ggsave(file = paste0("figures/school_maps/Crash Maps/",
@@ -502,7 +507,7 @@ for(school in WI_schools$NCES_CODE) {
                              exists = c(file.exists(paste0("figures/school_maps/Crash Maps/",
                                                            str_to_title(school_data |> pull(COUNTY)), 
                                                            " County/",
-                                                           school_data |> pull(DISTRICT_NAME), 
+                                                           school_data |> pull(DISTRICT), 
                                                            " School District/",
                                                            str_replace_all(school_data |> pull(SCHOOLTYPE), "/","-"), 
                                                            "s/",
@@ -519,6 +524,6 @@ districts_not_done <- data.frame(districts = c(unique(WI_schools |>
                                         filter(exists == FALSE) |> 
                                         pull(NCES_CODE)),
                 !st_is_empty(SHAPE)) |> 
-         pull(DISTRICT_NAME))))
+         pull(DISTRICT))))
 write_csv(districts_not_done, file = "parameters/districts_not_done.csv")
 ```
