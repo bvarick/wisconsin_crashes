@@ -308,7 +308,8 @@ generate_school_maps <- function(district) {
                   st_crop(bbox),
                 inherit.aes = FALSE,
                 aes(color = lts)) +
-        scale_color_manual(values = bike_lts_scale$color, name = "Bike Level of Traffic Stress")
+        scale_color_manual(values = bike_lts_scale$color, name = "Bike Level of Traffic Stress") +
+        new_scale_color()
     }
     
     school_map <- school_map +
@@ -333,7 +334,6 @@ generate_school_maps <- function(district) {
             plot.caption = element_text(color = "grey")) +
       
       # add walk boundary
-      new_scale_color() +
       geom_sf(data = walk_boundary_poly,
               inherit.aes = FALSE,
               aes(color = paste0(walk_boundary_mi, " mile walking boundary")),
