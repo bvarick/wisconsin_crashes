@@ -1,2 +1,2 @@
-county_focus,school_type_focus,district_focus,parallel,refresh_basemaps
-ALL,ALL,ALL,TRUE,TRUE
+county_focus,school_type_focus,district_focus,parallel,refresh_basemaps,bike_lts
+ALL,ALL,ALL,TRUE,TRUE,FALSE

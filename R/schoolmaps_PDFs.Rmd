@@ -38,26 +38,17 @@ load(file = "data/TOPS/retrieve_date.Rda")
 load(file = "data/TOPS/injury_severity.Rda")
 ```
 
+## Make TOPS data type sf
+```{r sfTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+TOPS_data_sf <- TOPS_data |> 
+  filter_out(is.na(longitude),
+             is.na(latitude)) |> 
+  st_as_sf(coords = c("longitude", "latitude"),
+           crs = 4326)
+```
+
 ## Load school data
 ```{r schooldata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-## add school enrollment data
-# enrollment <- read_csv(file = "data/Schools/enrollment_by_gradelevel_certified_2024-25/enrollment_by_gradelevel_certified_2024-25.csv",
-#                        col_types = "ccccccccccccciid")
-# enrollment_wide <- 
-#   enrollment |> 
-#   mutate(district_school = paste0(DISTRICT_CODE, SCHOOL_CODE),
-#          variable_name = paste0(GROUP_BY, "__", GROUP_BY_VALUE)) |>
-#   mutate(variable_name = str_replace_all(variable_name, "[ ]", "_")) |>
-#   pivot_wider(id_cols = c(district_school, GRADE_LEVEL, SCHOOL_NAME, DISTRICT_NAME, GRADE_GROUP, CHARTER_IND), names_from = variable_name, values_from = PERCENT_OF_GROUP) |>
-#   group_by(district_school, SCHOOL_NAME, DISTRICT_NAME, GRADE_GROUP, CHARTER_IND) |>
-#   summarise_at(vars("Disability__Autism":"Migrant_Status__[Data_Suppressed]"), mean, na.rm = TRUE)
-
-district_info <- data.frame(name = c("Madison Metropolitan", "Milwaukee"),
-                            code = c("3269","3619"),
-                            walk_boundary_hs = c(1.5, 2),
-                            walk_boundary_ms = c(1.5, 2),
-                            walk_boundary_es = c(1.5, 1))
-
 ## load school locations
 WI_schools <- st_read(dsn = "data/Schools/Wisconsin_Public_Schools_1685606960273492878.gpkg")
 
@@ -69,49 +60,16 @@ WI_schools <- WI_schools |>
 WI_schools <- WI_schools |>
   filter_out(VIRTUAL == "Yes")
 
-#WI_schools <- left_join(WI_schools |> mutate(district_school = paste0(SDID, SCH_CODE)), 
-#                        enrollment_wide, 
-#                        join_by(district_school))
-```
-
-
-## Load bike LTS networks
-```{r bikeLTS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-bike_lts <- list()
-for(file in list.files("data/bike_lts")) {
-  county <- str_sub(file, 10, -9)
-  lts_run <- st_read(paste0("data/bike_lts/", file)) |> 
-    st_transform(crs = 4326)
-  lts_run[["lts"]] <- as.factor(lts_run$LTS_F)
-  bike_lts[[county]] <- lts_run
-}
-bike_lts_scale <- data.frame(code = c(1, 2, 3, 4, 9),
-                             color = c("#1a9641",
-                                       "#a6d96a",
-                                       "#fdae61",
-                                       "#d7191c",
-                                       "#d7191c"))
-
-```
-
-## Load API keys from StadiaMaps and the census
-```{r APIkeys, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-# register stadia API key ----
-register_stadiamaps(key = substr(read_file(file = "api_keys/stadia_api_key"), 1, 36))
-
-# load census api key ----
-#census_api_key(key = substr(read_file(file = "api_keys/census_api_key"), 1, 40))
-```
-
-## Load logos
-```{r logos, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-bikefed_logo <- image_read_svg(path = "icons/BWF_Vertical_4C.svg")
-school_symbol <- image_read_svg(path = "icons/school_FILL0_wght400_GRAD0_opsz24.svg")
+# Manually override some walk boundaries
+district_info <- data.frame(name = c("Madison Metropolitan", "Milwaukee"),
+                            code = c("3269","3619"),
+                            walk_boundary_hs = c(1.5, 2),
+                            walk_boundary_ms = c(1.5, 2),
+                            walk_boundary_es = c(1.5, 1))
 ```
 
 ## Set parameters of run
 ```{r runparameters, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-
 run_parameters <- read_csv(file = "parameters/run_parameters.csv")
 # set which counties to generate figures for
 county_focus <- run_parameters$county_focus
@@ -138,6 +96,40 @@ school_number <- length(unique(WI_schools |> filter(str_to_upper(COUNTY) %in% co
                                               SCHOOLTYPE %in% school_type_focus, 
                                               DISTRICT %in% district_focus) |>  
                           pull(NCES_CODE)))
+```
+
+## Load bike LTS networks (if specified in run_parameters.csv)
+```{r bikeLTS, eval = run_parameters$bike_lts, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+bike_lts <- list()
+for(file in list.files("data/bike_lts")) {
+  county <- str_sub(file, 10, -9) |> 
+    str_to_lower()
+  lts_run <- st_read(paste0("data/bike_lts/", file)) |> 
+    st_transform(crs = 4326)
+  lts_run[["lts"]] <- as.factor(lts_run$LTS_F)
+  bike_lts[[county]] <- lts_run
+}
+bike_lts_scale <- data.frame(code = c(1, 2, 3, 4, 9),
+                             color = c("#1a9641",
+                                       "#a6d96a",
+                                       "#fdae61",
+                                       "#d7191c",
+                                       "#d7191c"))
+```
+
+## Load API keys from StadiaMaps and the census
+```{r APIkeys, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+# register stadia API key ----
+register_stadiamaps(key = substr(read_file(file = "api_keys/stadia_api_key"), 1, 36))
+
+# load census api key ----
+#census_api_key(key = substr(read_file(file = "api_keys/census_api_key"), 1, 40))
+```
+
+## Load logos
+```{r logos, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+bikefed_logo <- image_read_svg(path = "icons/BWF_Vertical_4C.svg")
+school_symbol <- image_read_svg(path = "icons/school_FILL0_wght400_GRAD0_opsz24.svg")
 ```
 
 ## generate county charts
@@ -180,75 +172,6 @@ for(county in county_focus) {
          width = 11,
          units = "in",
          create.dir = TRUE)
-  
-  # #  generate map for county
-  # county_data <- WI_schools |> filter(CTY_DIST %in% str_to_title(county))
-  # bbox <- st_bbox(st_transform(st_buffer(county_data |> pull(SHAPE), dist = 4000), crs = 4326))
-  # bbox <- c(left = as.double(bbox[1]), bottom = as.double(bbox[2]), right = as.double(bbox[3]), top = as.double(bbox[4]))
-  # 
-  # #get basemap
-  # basemap <- get_stadiamap(bbox = bbox, zoom = 12, maptype = "stamen_toner_lite")
-  # 
-  # # generate map
-  # ggmap(basemap) +
-  #   labs(title = paste0("Crashes between cars and youth (under 18) pedestrians/bicyclists in ", 
-  #                       str_to_title(county),
-  #                       " County"),
-  #        subtitle = paste0(min(year(TOPS_data$date), na.rm = TRUE), " - ", max(year(TOPS_data$date), na.rm = TRUE)),
-  #        caption = "data from Wisconsin DOT, UW TOPS Laboratory, Wisconsin DPI, and OpenStreetMap",
-  #        x = NULL,
-  #        y = NULL) +
-  #   theme(axis.text=element_blank(),
-  #         axis.ticks=element_blank()) +
-  #   
-  #   # add crash heatmap
-  #   # stat_density_2d(data = TOPS_data |> 
-  #   #                   filter(ROLE1 %in% c("BIKE", "PED") & age1 < 18 | ROLE2 %in% c("BIKE", "PED") & age2 < 18),
-  #   #                 inherit.aes = FALSE,
-  #   #                 geom = "polygon", 
-  #   #                 aes(fill = after_stat(level),
-  #   #                     x = longitude,
-  #   #                     y = latitude),
-  #   #                 alpha = 0.2,
-  #   #                 color = NA,
-  #   #                 na.rm = TRUE,
-  #   #                 bins = 12,
-  #   #                 n = 300) +
-  #   # scale_fill_distiller(type = "div", palette = "YlOrRd", guide = "none", direction = 1) +
-  #   
-  #   # add crashes
-  #   new_scale_color() +
-  #   geom_point(data = TOPS_data |> 
-  #                filter(ROLE1 %in% c("BIKE", "PED") & age1 < 18 | ROLE2 %in% c("BIKE", "PED") & age2 < 18) |>
-  #                filter(longitude >= as.double(bbox[1]), 
-  #                       latitude >= as.double(bbox[2]), 
-  #                       longitude <= as.double(bbox[3]), 
-  #                       latitude <= as.double(bbox[4])), 
-  #              aes(x = longitude,
-  #                  y = latitude,
-  #                  color = InjSevName),
-  #              shape = 18,
-  #              size = 1) +
-  #   scale_color_manual(values = injury_severity$color, name = "Crash Severity")
-  #   
-  #   # add school location
-  #   # new_scale_color() +
-  #   # geom_sf(data = st_transform(WI_schools, crs = 4326),
-  #   #         inherit.aes = FALSE,
-  #   #         aes(color = "school"),
-  #   #         size = 2,
-  #   #         shape = 0) +
-  #   # scale_color_manual(values = "black", name = NULL)
-  # 
-  # ggsave(file = paste0("figures/school_maps/Crash Maps/", 
-  #                                      str_to_title(county), " County/_", 
-  #                                      str_to_title(county), " County.pdf"), 
-  #        title = paste0(str_to_title(county), " County Youth Pedestrian/Bike crashes"),
-  #        device = pdf,
-  #        height = 8.5,
-  #        width = 11,
-  #        units = "in",
-  #        create.dir = TRUE)
 }
 ```
 
@@ -271,9 +194,7 @@ get_logo_bounds <- function(center_lon, center_lat, height_meters, image) {
   # Convert height from meters to degrees of latitude
   height_deg <- height_meters / 111320
   
-  # Calculate width in degrees:
-  # 1. Scale by image aspect ratio
-  # 2. Adjust for latitude distortion
+  # Calculate width in degrees
   width_deg <- (height_deg * img_aspect) / cos(center_lat * pi / 180)
   
   list(
@@ -301,12 +222,10 @@ generate_school_maps <- function(district) {
              !st_is_empty(SHAPE)) |>
       pull(NCES_CODE)) {
     school_data <- WI_schools |> filter(NCES_CODE == school)
-    i <- i + 1
     message(paste(school_data |> pull(SCHOOL), "-", 
                   district, "School District", "-", 
-                  school_data |> pull(COUNTY), "County |", 
-                  i, "/", school_number, "|", 
-                  round(i/school_number*100, 2), "%"))
+                  school_data |> pull(COUNTY), "County")
+            )
 
     #find walk boundary distance for school
     if(length(which(district_info$name == district)) > 0) {
@@ -334,13 +253,13 @@ generate_school_maps <- function(district) {
       pull(SHAPE) |> 
       st_buffer(dist = walk_boundary_m + 500) |> 
       st_bbox()
-    bbox <- c(left = as.double(bbox[1]), 
+    bbox_list <- c(left = as.double(bbox[1]), 
                      bottom = as.double(bbox[2]), 
                      right = as.double(bbox[3]), 
                      top = as.double(bbox[4]))
     
     #get basemap
-    basemap <- get_stadiamap(bbox = bbox, 
+    basemap <- get_stadiamap(bbox = bbox_list, 
                              zoom = 15, 
                              maptype = "stamen_toner_lite")
     
@@ -354,25 +273,23 @@ generate_school_maps <- function(district) {
       )
     # Bike Fed logo
     # Adjustable parameters
-    logo_height_pct <- 0.16        # Logo height as % of map height
-    offset_from_right_pct <- 0.05  # Gap between map edge and logo
+    # Logo height as % of map height
+    logo_height_pct <- 0.16
+    # Gap between right map edge and logo
+    offset_from_right_pct <- 0.05
     
-    # Calculate map dimensions
-    map_height_deg <- bbox['top'] - bbox['bottom']
-    map_width_deg <- bbox['right'] - bbox['left']
-    
-    # Calculate logo height in meters
-    logo_height_meters <- (map_height_deg * logo_height_pct) * 111320
-    
+    # Convert to meters
+    logo_height_deg <- ((bbox['top'] - bbox['bottom']) * logo_height_pct)
+    logo_height_meters <- logo_height_deg * 111320
+
     # Calculate center latitude
-    logo_center_lat <- bbox['top'] - map_height_deg * (logo_height_pct / 2)
+    logo_center_lat <- bbox['top'] - (bbox['top'] - bbox['bottom']) * (logo_height_pct / 2)
     
     # Calculate the logo width in degrees
-    logo_height_deg <- logo_height_meters / 111320
     logo_width_deg <- logo_height_deg / cos(logo_center_lat * pi / 180)
     
     # Calculate center longitude: right edge + offset + half the logo width
-    logo_center_lon <- bbox['right'] + map_width_deg * offset_from_right_pct + logo_width_deg / 2
+    logo_center_lon <- bbox['right'] + (bbox['right'] - bbox['left']) * offset_from_right_pct + logo_width_deg / 2
     
     # Get square bounds
     bikefed_bounds <- get_logo_bounds(
@@ -382,7 +299,19 @@ generate_school_maps <- function(district) {
       bikefed_logo)
     
     # generate map
-    ggmap(basemap) +
+    school_map <- ggmap(basemap)
+    
+    ## add bike lts if set in run_parameters
+    if(run_parameters$bike_lts == TRUE){
+      school_map <- school_map +
+        geom_sf(data = bike_lts[[school_data |> pull(COUNTY) |> str_to_lower()]] |> 
+                  st_crop(bbox),
+                inherit.aes = FALSE,
+                aes(color = lts)) +
+        scale_color_manual(values = bike_lts_scale$color, name = "Bike Level of Traffic Stress")
+    }
+    
+    school_map <- school_map +
       labs(title = paste0(
         "Crashes between cars and youth (<18) pedestrians/bicyclists near ",
         #        "Crashes between cars and all pedestrians/bicyclists near ",
@@ -403,24 +332,16 @@ generate_school_maps <- function(district) {
             axis.ticks=element_blank(),
             plot.caption = element_text(color = "grey")) +
       
-      ## add bike lts
-#      geom_sf(data = bike_lts[[county]],
-#             inherit.aes = FALSE,
-#             aes(color = lts)) +
-#      scale_color_manual(values = bike_lts_scale$color, name = "Bike Level of Traffic Stress") +
-      
-
       # add walk boundary
       new_scale_color() +
-      new_scale_fill() +
       geom_sf(data = walk_boundary_poly,
               inherit.aes = FALSE,
               aes(color = paste0(walk_boundary_mi, " mile walking boundary")),
               fill = NA,
               linewidth = 1) +
       scale_color_manual(values = "black", name = NULL) +
+      
       # add school location
-      # geom_sf(data = school_data, inherit.aes = FALSE) +
       annotation_raster(school_symbol,
                         # Position adjustments here using plot_box$max/min/range
                         ymin = school_bounds$ymin,
@@ -443,26 +364,23 @@ generate_school_maps <- function(district) {
       coord_sf(clip = "off") +
       # add crash locations
       new_scale_fill() +
-      geom_point(data = TOPS_data |>
+      geom_sf(data = TOPS_data_sf |>
+                st_crop(bbox) |> 
                    filter(ROLE1 %in% c("BIKE", "PED") 
                           & age1 < 18 
                           | ROLE2 %in% c("BIKE", "PED") 
                           & age2 < 18
                           ) |>
-                   filter(longitude >= as.double(bbox[1]),
-                          latitude >= as.double(bbox[2]),
-                          longitude <= as.double(bbox[3]),
-                          latitude <= as.double(bbox[4])) |>
                    arrange(ped_inj_name),
-                 aes(x = longitude,
-                     y = latitude,
-                     fill = ped_inj_name),
-                 shape = 23,
-                 size = 3,
-                 alpha = 0.8) +
+              inherit.aes = FALSE,
+              aes(fill = ped_inj_name),
+              shape = 23,
+              size = 3,
+              alpha = 0.8) +
       scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = "Crash Severity")
-        
-    ggsave(file = paste0("figures/school_maps/Crash Maps/",
+    
+    ggsave(school_map,
+           file = paste0("figures/school_maps/Crash Maps/",
                          str_to_title(school_data |> pull(COUNTY)), 
                          " County/",
                          school_data |> pull(DISTRICT), 
@@ -485,7 +403,6 @@ generate_school_maps <- function(district) {
 
 ## Generate the school maps
 ```{r generatemaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = NA}
-i <- 0
 if (run_parameters$parallel) {
   mclapply(district_focus,
            generate_school_maps,
@@ -501,7 +418,10 @@ if (run_parameters$parallel) {
 
 # double check that all schools have a map ----
 double_check <- list()
-for(school in WI_schools$NCES_CODE) {
+for(school in WI_schools |> 
+    filter(DISTRICT %in% district_focus) |> 
+    filter_out(is.na(NCES_CODE)) |> 
+    pull(NCES_CODE)) {
   school_data <- WI_schools |> filter(NCES_CODE %in% school)
   school_check <- data.frame(NCES_CODE = c(school),
                              exists = c(file.exists(paste0("figures/school_maps/Crash Maps/",

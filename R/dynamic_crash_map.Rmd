@@ -36,7 +36,6 @@ load(file = "data/TOPS/vuln_roles.Rda")
 load(file = "data/TOPS/retrieve_date.Rda")
 load(file = "data/TOPS/injury_severity.Rda")
 injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = injury_severity$InjSevName)
-
 ```
 
 ## Mutate TOPS_data
@@ -92,7 +91,6 @@ Pedestrian_Crash_Data <- TOPS_data %>%
 
 ## Load Census data
 ```{r censusdata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-
 # add population census data
 census_api_key(key = substr(read_file(file = "api_keys/census_api_key"), 1, 40))
 county_populations <- get_estimates(geography = "county", year = 2022, product = "population", state = "Wisconsin", geometry = TRUE) %>%
