@@ -56,7 +56,7 @@ TOPS_geom <- st_as_sf(TOPS_data %>% filter(!is.na(latitude)), coords = c("longit
 
 ## load school locations ----
 ```{r loadschooldata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-WI_schools <- st_read(dsn = "data/Schools/Wisconsin_Public_Schools_-5986231931870160084.gpkg")
+WI_schools <- st_read(dsn = "data/Schools/Wisconsin_Public_Schools_1685606960273492878.gpkg")
 WI_schools <- WI_schools %>% 
   filter(is.double(LAT),
          LAT > 0) %>%
