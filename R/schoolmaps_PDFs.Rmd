@@ -316,8 +316,8 @@ generate_school_maps <- function(district) {
       labs(title = paste0(
         "Crashes between cars and youth (<18) pedestrians/bicyclists near ",
         #        "Crashes between cars and all pedestrians/bicyclists near ",
-        school_data |> pull(SCHOOL),
-        " School"),
+        school_data |> pull(SCHOOL)
+        ),
         subtitle = paste0(school_data |> pull(DISTRICT),
                           " School District | ",
                           min(year(TOPS_data$date), na.rm = TRUE), 
@@ -350,7 +350,7 @@ generate_school_maps <- function(district) {
                         xmax = school_bounds$xmax) +
       geom_sf_label(data = school_data,
                     inherit.aes = FALSE,
-                    mapping = aes(label = paste(SCHOOL, "School")),
+                    mapping = aes(label = SCHOOL),
                     nudge_y = 0.0015,
                     linewidth = 0.04,
                     size = 2) +
@@ -388,8 +388,8 @@ generate_school_maps <- function(district) {
                          str_replace_all(school_data |> pull(SCHOOLTYPE), "/","-"), 
                          "s/",
                          str_replace_all(school_data |> pull(SCHOOL), "/", "-"), 
-                        # " School_all.pdf"),
-                        " School.pdf"),
+                        # "_all.pdf"),
+                        ".pdf"),
            title = paste0(school_data |> pull(SCHOOL), " Youth Pedestrian/Bike crashes"),
            #title = paste0(school_data |> pull(SCHOOL), " All Pedestrian/Bike crashes"),
            device = pdf,
