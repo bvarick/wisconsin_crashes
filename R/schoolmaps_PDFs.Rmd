@@ -30,23 +30,6 @@ library(rsvg)
 library(parallel)
 ```
 
-## Load TOPS data
-```{r loadTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-load(file = "data/TOPS/TOPS_data.Rda")
-load(file = "data/TOPS/vuln_roles.Rda")
-load(file = "data/TOPS/retrieve_date.Rda")
-load(file = "data/TOPS/injury_severity.Rda")
-```
-
-## Make TOPS data type sf
-```{r sfTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-TOPS_data_sf <- TOPS_data |> 
-  filter_out(is.na(longitude),
-             is.na(latitude)) |> 
-  st_as_sf(coords = c("longitude", "latitude"),
-           crs = 4326)
-```
-
 ## Load school data
 ```{r schooldata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 ## load school locations
@@ -58,7 +41,14 @@ WI_schools <- WI_schools |>
 
 ## Filter out virtual schools
 WI_schools <- WI_schools |>
-  filter_out(VIRTUAL == "Yes")
+  filter_out(
+    when_any(
+      VIRTUAL == "Yes",
+      is.na(LAT),
+      is.na(LON),
+      is.na(NCES_CODE)
+      )
+    )
 
 # Manually override some walk boundaries
 district_info <- data.frame(name = c("Madison Metropolitan", "Milwaukee"),
@@ -87,15 +77,44 @@ if(str_to_lower(school_type_focus) == "all") {
 district_focus <- run_parameters$district_focus
 if(str_to_lower(district_focus) == "all") {
   district_focus <- WI_schools |> 
-    filter(str_to_upper(COUNTY) %in% county_focus) |> 
+    filter(str_to_upper(COUNTY) %in% str_to_upper(county_focus)) |> 
+    pull(DISTRICT) |> 
+    unique()
+} else {
+  district_focus <- WI_schools |> 
+    filter(str_to_upper(COUNTY) %in% str_to_upper(county_focus),
+           str_to_upper(DISTRICT) %in% str_to_upper(district_focus)) |> 
     pull(DISTRICT) |> 
     unique()
 }
 
-school_number <- length(unique(WI_schools |> filter(str_to_upper(COUNTY) %in% county_focus,  
-                                              SCHOOLTYPE %in% school_type_focus, 
-                                              DISTRICT %in% district_focus) |>  
+# Filter WI_schools
+WI_schools <- WI_schools |> 
+  filter(
+    str_to_upper(DISTRICT) %in% str_to_upper(district_focus),
+    str_to_upper(SCHOOLTYPE) %in% str_to_upper(school_type_focus),
+    str_to_upper(COUNTY) %in% str_to_upper(county_focus)
+         )
+
+school_number <- length(unique(WI_schools |>  
                           pull(NCES_CODE)))
+```
+
+## Load TOPS data
+```{r loadTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+load(file = "data/TOPS/TOPS_data.Rda")
+load(file = "data/TOPS/vuln_roles.Rda")
+load(file = "data/TOPS/retrieve_date.Rda")
+load(file = "data/TOPS/injury_severity.Rda")
+```
+
+## Make TOPS data type sf
+```{r sfTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+TOPS_data_sf <- TOPS_data |> 
+  filter_out(is.na(longitude),
+             is.na(latitude)) |> 
+  st_as_sf(coords = c("longitude", "latitude"),
+           crs = 4326)
 ```
 
 ## Load bike LTS networks (if specified in run_parameters.csv)
@@ -185,7 +204,7 @@ options(osrm.profile = "walk")
 ```
 
 ## Functions to generate maps
-```{r schoolmaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = NA}
+```{r schoolMaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = NA}
 # calculates the width and height lat/lon for a given school
 get_logo_bounds <- function(center_lon, center_lat, height_meters, image) {
   # Get image aspect ratio
@@ -217,9 +236,7 @@ generate_school_maps <- function(district) {
   }
   file_drawer("index.rds")
   for(school in WI_schools |>
-      filter(DISTRICT %in% district,
-             SCHOOLTYPE %in% school_type_focus,
-             !st_is_empty(SHAPE)) |>
+      filter(str_to_upper(DISTRICT) %in% str_to_upper(district)) |>
       pull(NCES_CODE)) {
     school_data <- WI_schools |> filter(NCES_CODE == school)
     message(paste(school_data |> pull(SCHOOL), "-", 
@@ -402,7 +419,7 @@ generate_school_maps <- function(district) {
 ```
 
 ## Generate the school maps
-```{r generatemaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = NA}
+```{r generateMaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = NA}
 if (run_parameters$parallel) {
   mclapply(district_focus,
            generate_school_maps,
@@ -414,14 +431,13 @@ if (run_parameters$parallel) {
   lapply(district_focus,
          generate_school_maps)
 }
+```
 
-
+# Check that all schools have a map PDF
+```{r checkMaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = NA}
 # double check that all schools have a map ----
 double_check <- list()
-for(school in WI_schools |> 
-    filter(DISTRICT %in% district_focus) |> 
-    filter_out(is.na(NCES_CODE)) |> 
-    pull(NCES_CODE)) {
+for(school in WI_schools |> pull(NCES_CODE)) {
   school_data <- WI_schools |> filter(NCES_CODE %in% school)
   school_check <- data.frame(NCES_CODE = c(school),
                              exists = c(file.exists(paste0("figures/school_maps/Crash Maps/",
@@ -432,8 +448,8 @@ for(school in WI_schools |>
                                                            str_replace_all(school_data |> pull(SCHOOLTYPE), "/","-"), 
                                                            "s/",
                                                            str_replace_all(school_data |> pull(SCHOOL), "/", "-"), 
-                                                           #" School.pdf"))))
-                                                           " School.pdf"))))
+                                                           #".pdf"))))
+                                                           ".pdf"))))
   double_check[[school]] <- school_check
 }
 double_check <- bind_rows(double_check)
