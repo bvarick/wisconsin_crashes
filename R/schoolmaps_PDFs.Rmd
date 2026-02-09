@@ -97,6 +97,10 @@ WI_schools <- WI_schools |>
 
 school_number <- length(unique(WI_schools |>  
                           pull(NCES_CODE)))
+
+# Set run parameters as a number
+run_parameters$parallel_workers <- as.numeric(run_parameters$parallel_workers)
+
 ```
 
 ## Load TOPS data
@@ -395,7 +399,7 @@ generate_school_maps <- function(district) {
       # add crash locations
       new_scale_fill() +
       geom_sf(data = TOPS_data_sf |>
-                st_crop(bbox) |> 
+                st_filter(st_as_sfc(bbox)) |> 
                    filter(ROLE1 %in% c("BIKE", "PED") 
                           & age1 < 18 
                           | ROLE2 %in% c("BIKE", "PED") 
@@ -435,8 +439,8 @@ generate_school_maps <- function(district) {
 ## Generate the school maps
 ```{r generateMaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = FALSE}
 # Define the plan (parallel vs sequential)
-if (run_parameters$parallel) {
-  plan(multicore, workers = 8)
+if (run_parameters$parallel_workers > 1) {
+  plan(multicore, workers = run_parameters$parallel_workers)
 } else {
   plan(sequential)
 }
