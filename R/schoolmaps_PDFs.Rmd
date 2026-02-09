@@ -17,7 +17,6 @@ editor_options:
 ## Libraries
 ```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 date()
-rm(list=ls())
 library(tidyverse)
 library(ggmap)
 library(sf)
@@ -28,7 +27,6 @@ library(RColorBrewer)
 library(magick)
 library(rsvg)
 library(furrr)
-#library(parallel)
 ```
 
 ## Load school data
@@ -52,11 +50,11 @@ WI_schools <- WI_schools |>
     )
 
 # Manually override some walk boundaries
-district_info <- data.frame(name = c("Madison Metropolitan", "Milwaukee"),
-                            code = c("3269","3619"),
-                            walk_boundary_hs = c(1.5, 2),
-                            walk_boundary_ms = c(1.5, 2),
-                            walk_boundary_es = c(1.5, 1))
+district_walk_policies <- tribble(
+  ~name, ~hs,  ~ms,  ~es,
+  "Madison Metropolitan", 1.5, 1.5, 1.5,
+  "Milwaukee", 2.0, 2.0, 1.0
+)
 ```
 
 ## Set parameters of run
@@ -253,28 +251,34 @@ generate_school_maps <- function(district) {
                   school_data |> pull(COUNTY), "County")
             )
 
-    #find walk boundary distance for school
-    if(length(which(district_info$name == district)) > 0) {
-      ifelse((school_data |> pull(SCHOOLTYPE)) %in% "High School",
-             walk_boundary_mi <- district_info$walk_boundary_hs[district_info$name == district],
-             ifelse((school_data |> pull(SCHOOLTYPE)) %in% c("Junior High School", "Middle School"),
-                    walk_boundary_mi <- district_info$walk_boundary_ms[district_info$name == district],
-                    ifelse((school_data |> pull(SCHOOLTYPE)) %in% c("Combined Elementary/Secondary School", "Elementary School"),
-                           walk_boundary_mi <- district_info$walk_boundary_es[district_info$name == district],
-                           walk_boundary <- 2)))
-    } else {
-      walk_boundary_mi <- 2
-    }
-    walk_boundary_m <- walk_boundary_mi * 1609
+    # Set default walk boundary to 2 miles (per DPI)
+    walk_boundary_mi <- 2.0
     
+    # Override default if specified in district_walk_policies
+    current_school_type <- school_data |> pull(SCHOOLTYPE)
+    target_district <- district_walk_policies |> filter(name == district)
+    
+    if (nrow(target_district) > 0) {
+      walk_boundary_mi <- case_when(
+        current_school_type %in% "High School" ~ target_district$hs,
+        current_school_type %in% c("Junior High School", "Middle School") ~ target_district$ms,
+        current_school_type %in% c("Combined Elementary/Secondary School", 
+                                   "Elementary School") ~ target_district$es,
+        TRUE ~ 2.0 # For any other school types
+      )
+    }
+    # Convert miles to meters
+    walk_boundary_m <- walk_boundary_mi * 1609
+
+    # Query OSRM for the walk_boundary_poly    
     walk_boundary_poly <- osrmIsodistance(
       loc = school_data |> pull(SHAPE),
       breaks = c(walk_boundary_m),
       n = 2000) |> 
       st_make_valid() |> 
-      fill_holes(units::set_units(1, km^2))
+      fill_holes(units::set_units(1, "km^2"))
     
-    # create bounding box from school, 5km away.
+    # create bounding box from school, 500m outside walk boundary.
     bbox <- school_data |> 
       pull(SHAPE) |> 
       st_buffer(dist = walk_boundary_m + 500) |> 
@@ -327,8 +331,9 @@ generate_school_maps <- function(district) {
     # generate map
     school_map <- ggmap(basemap)
     
-    ## add bike lts if set in run_parameters
-    if(run_parameters$bike_lts == TRUE){
+    ## add bike lts if set in run_parameters and available for the county
+    if(run_parameters$bike_lts == TRUE &&
+       !is.null(bike_lts[[county]])){
       school_map <- school_map +
         geom_sf(data = bike_lts[[school_data |> pull(COUNTY) |> str_to_lower()]] |> 
                   st_crop(bbox),
@@ -369,7 +374,6 @@ generate_school_maps <- function(district) {
       
       # add school location
       annotation_raster(school_symbol,
-                        # Position adjustments here using plot_box$max/min/range
                         ymin = school_bounds$ymin,
                         ymax = school_bounds$ymax,
                         xmin = school_bounds$xmin,
@@ -380,8 +384,8 @@ generate_school_maps <- function(district) {
                     nudge_y = 0.0015,
                     linewidth = 0.04,
                     size = 2) +
+      # Add Bike Fed logo in top right
       annotation_raster(bikefed_logo,
-                        # Position adjustments here using plot_box$max/min/range
                         ymin = bikefed_bounds$ymin,
                         ymax = bikefed_bounds$ymax,
                         xmin = bikefed_bounds$xmin,
@@ -405,6 +409,7 @@ generate_school_maps <- function(district) {
               alpha = 0.8) +
       scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = "Crash Severity")
     
+    # Save map
     ggsave(school_map,
            file = paste0("figures/school_maps/Crash Maps/",
                          str_to_title(school_data |> pull(COUNTY)), 
@@ -428,19 +433,7 @@ generate_school_maps <- function(district) {
 ```
 
 ## Generate the school maps
-```{r generateMaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = TRUE}
-# if (run_parameters$parallel) {
-#   mclapply(district_focus,
-#            generate_school_maps,
-#            mc.cores = 10,
-#            mc.cleanup = TRUE,
-#            mc.preschedule = TRUE,
-#            mc.silent = FALSE)
-# } else {
-#   lapply(district_focus,
-#          generate_school_maps)
-# }
-
+```{r generateMaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = FALSE}
 # Define the plan (parallel vs sequential)
 if (run_parameters$parallel) {
   plan(multicore, workers = 8)
