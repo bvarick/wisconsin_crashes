@@ -1,0 +1,25 @@
+## Specify parameters for running schoolsmaps_PDFs
+
+# Which counties to generate maps for.  
+# "ALL" generates for  all counties
+county_focus: "ALL"
+
+# Which school types (i.e. Elementary School, Middle School, High School)
+# to generate maps for.  
+# "ALL" generates for all school types
+school_type_focus: "ALL"
+
+# Which school district name (i.e. Madison Metropolitan, Milwaukee)  
+# to generate maps for.  
+# "ALL" generates for all school districts
+district_focus: "ALL"
+
+# How many workers to parallelize over. A value of 1 runs sequentially
+parallel_workers: 6
+
+# Refresh the Stadia basemaps or use the cached files
+refresh_basemaps: yes
+
+# Include Bike Level of Traffic Stress in maps
+# Add any bike lts files as 'data/bike_lts/bike_lts_COUNTYNAME.geojson'
+bike_lts: no

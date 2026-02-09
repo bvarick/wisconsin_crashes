@@ -4,4 +4,4 @@
 !.gitignore
 
 # Except the run_parameters template
-!run_parameters_template.csv
+!example_run_parameters.yaml

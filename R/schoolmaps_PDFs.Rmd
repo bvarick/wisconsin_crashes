@@ -17,6 +17,7 @@ editor_options:
 ## Libraries
 ```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 date()
+library(yaml)
 library(tidyverse)
 library(ggmap)
 library(sf)
@@ -27,13 +28,14 @@ library(RColorBrewer)
 library(magick)
 library(rsvg)
 library(furrr)
+run_parameters <- read_yaml("parameters/run_parameters.yaml")
 ```
 
 ## Load school data
 ```{r schooldata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 ## load school locations
 WI_schools <- st_read(dsn = "data/Schools/Wisconsin_Public_Schools_1685606960273492878.gpkg")
-
+# 
 ## Set crs
 WI_schools <- WI_schools |> 
   st_transform(crs = 4326)
@@ -59,7 +61,7 @@ district_walk_policies <- tribble(
 
 ## Set parameters of run
 ```{r runparameters, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-run_parameters <- read_csv(file = "parameters/run_parameters.csv")
+#run_parameters <- read_csv(file = "parameters/run_parameters.csv")
 # set which counties to generate figures for
 county_focus <- run_parameters$county_focus
 if(str_to_lower(county_focus) == "all") {
