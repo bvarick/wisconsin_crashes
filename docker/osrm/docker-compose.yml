@@ -10,9 +10,9 @@ services:
             - ./data-raw/wisconsin-latest.osm.pbf:/data/wisconsin-latest.osm.pbf
         image: osrm/osrm-backend
         command: osrm-routed --algorithm mld /data/wisconsin-latest.osrm
-    osrm-frontend-foot:
-        ports:
-            - 9966:9966
-        environment:
-            OSRM_BACKEND: 'http://localhost:5000'
-        image: osrm/osrm-frontend
+#    osrm-frontend-foot:
+#        ports:
+#            - 9966:9966
+#        environment:
+#            OSRM_BACKEND: 'http://localhost:5000'
+#        image: osrm/osrm-frontend
