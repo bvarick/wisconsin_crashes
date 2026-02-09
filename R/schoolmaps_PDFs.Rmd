@@ -59,9 +59,8 @@ district_walk_policies <- tribble(
 )
 ```
 
-## Set parameters of run
-```{r runparameters, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-#run_parameters <- read_csv(file = "parameters/run_parameters.csv")
+## Set parameters of run and filter schools
+```{r runParameters, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 # set which counties to generate figures for
 county_focus <- run_parameters$county_focus
 if(str_to_lower(county_focus) == "all") {
@@ -100,9 +99,10 @@ WI_schools <- WI_schools |>
 school_number <- length(unique(WI_schools |>  
                           pull(NCES_CODE)))
 
-# Set run parameters as a number
-run_parameters$parallel_workers <- as.numeric(run_parameters$parallel_workers)
-
+# remove extra "School" in school names
+WI_schools <- WI_schools |> 
+  mutate(SCHOOL = str_remove(SCHOOL, " School$")) |> 
+  mutate(SCHOOL = paste0(SCHOOL, " School"))
 ```
 
 ## Load TOPS data
@@ -469,7 +469,7 @@ for(school in WI_schools |> pull(NCES_CODE)) {
                                                            str_replace_all(school_data |> pull(SCHOOLTYPE), "/","-"), 
                                                            "s/",
                                                            str_replace_all(school_data |> pull(SCHOOL), "/", "-"), 
-                                                           #".pdf"))))
+                                                           # "_all.pdf"),
                                                            ".pdf"))))
   double_check[[school]] <- school_check
 }
