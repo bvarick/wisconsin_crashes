@@ -27,7 +27,8 @@ library(ggnewscale)
 library(RColorBrewer)
 library(magick)
 library(rsvg)
-library(parallel)
+library(furrr)
+#library(parallel)
 ```
 
 ## Load school data
@@ -128,6 +129,7 @@ for(file in list.files("data/bike_lts")) {
   lts_run[["lts"]] <- as.factor(lts_run$LTS_F)
   bike_lts[[county]] <- lts_run
 }
+rm(lts_run)
 bike_lts_scale <- data.frame(code = c(1, 2, 3, 4, 9),
                              color = c("#1a9641",
                                        "#a6d96a",
@@ -147,8 +149,11 @@ register_stadiamaps(key = substr(read_file(file = "api_keys/stadia_api_key"), 1,
 
 ## Load logos
 ```{r logos, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-bikefed_logo <- image_read_svg(path = "icons/BWF_Vertical_4C.svg")
-school_symbol <- image_read_svg(path = "icons/school_FILL0_wght400_GRAD0_opsz24.svg")
+bikefed_logo_file <- "icons/BWF_Vertical_4C.svg"
+school_symbol_file <- "icons/school_FILL0_wght400_GRAD0_opsz24.svg"
+
+bikefed_logo <- image_read_svg(path = bikefed_logo_file)
+school_symbol <- image_read_svg(path = school_symbol_file)
 ```
 
 ## generate county charts
@@ -225,6 +230,10 @@ get_logo_bounds <- function(center_lon, center_lat, height_meters, image) {
 }
 
 generate_school_maps <- function(district) {
+  
+  # Load logos (for furrr)
+  bikefed_logo <- image_read_svg(path = bikefed_logo_file)
+  school_symbol <- image_read_svg(path = school_symbol_file)
   
   message(paste("***", district, "School District |"))
   options(ggmap.file_drawer = paste0("basemaps/districts/", district))
@@ -419,18 +428,31 @@ generate_school_maps <- function(district) {
 ```
 
 ## Generate the school maps
-```{r generateMaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = NA}
+```{r generateMaps, eval = TRUE, echo = TRUE, results = "show", warning = NA, error = TRUE, message = TRUE}
+# if (run_parameters$parallel) {
+#   mclapply(district_focus,
+#            generate_school_maps,
+#            mc.cores = 10,
+#            mc.cleanup = TRUE,
+#            mc.preschedule = TRUE,
+#            mc.silent = FALSE)
+# } else {
+#   lapply(district_focus,
+#          generate_school_maps)
+# }
+
+# Define the plan (parallel vs sequential)
 if (run_parameters$parallel) {
-  mclapply(district_focus,
-           generate_school_maps,
-           mc.cores = 10,
-           mc.cleanup = TRUE,
-           mc.preschedule = TRUE,
-           mc.silent = FALSE)
+  plan(multicore, workers = 8)
 } else {
-  lapply(district_focus,
-         generate_school_maps)
+  plan(sequential)
 }
+
+# Generate the maps
+future_walk(district_focus, 
+            generate_school_maps, 
+            .progress = TRUE,
+            .options = furrr_options(seed = TRUE))
 ```
 
 # Check that all schools have a map PDF
