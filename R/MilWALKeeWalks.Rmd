@@ -17,7 +17,6 @@ editor_options:
 ## Libraries
 ```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 date()
-rm(list=ls())
 library(tidyverse)
 library(ggmap)
 library(sf)
@@ -49,7 +48,7 @@ TOPS_data_filtered <- TOPS_data %>% filter(CNTYNAME == focus_county)
 ```{r startenddates, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 year_min <- min(year(TOPS_data_filtered$date))
 year_max <- max(year(TOPS_data_filtered$date))
-month_end <- 9
+month_end <- 12
 date_max <- ymd(paste(year_max, month_end + 1,1)) - 1
 ```
 
