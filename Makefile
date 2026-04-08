@@ -15,11 +15,15 @@ schoolmaps_PDFs: R/schoolmaps_PDFs.Rmd
 crashmaps_dynamic: R/dynamic_crash_map.Rmd
 	R -e 'library("rmarkdown"); old_path <- Sys.getenv("PATH"); Sys.setenv(PATH = paste(old_path, "/usr/local/bin", sep = ":")); rmarkdown::render(knit_root_dir = "../", output_dir = "./html", input = "./R/dynamic_crash_map.Rmd", output_file = "./html/dynamic_crash_map.html")'
 
+
 crashmaps_dynamic_milwaukee: R/dynamic_crash_map_milwaukee.Rmd
 	R -e 'library("rmarkdown"); old_path <- Sys.getenv("PATH"); Sys.setenv(PATH = paste(old_path, "/usr/local/bin", sep = ":")); rmarkdown::render(knit_root_dir = "../", output_dir = "./html", input = "./R/dynamic_crash_map_milwaukee.Rmd", output_file = "./html/dynamic_crash_map_milwaukee.html")'
 
 crash_data_summaries: R/crash_data_summaries.Rmd
 	R -e 'library("rmarkdown"); old_path <- Sys.getenv("PATH"); Sys.setenv(PATH = paste(old_path, "/usr/local/bin", sep = ":")); rmarkdown::render(knit_root_dir = "../", output_dir = "./html", input = "./R/crash_data_summaries.Rmd", output_file = "./html/crash_data_summaries.html")'
+
+crash_data_summaries_dynamic: R/dynamic_crash_summaries.Rmd
+	R -e 'library("rmarkdown"); old_path <- Sys.getenv("PATH"); Sys.setenv(PATH = paste(old_path, "/usr/local/bin", sep = ":")); rmarkdown::render(knit_root_dir = "../", output_dir = "./html", input = "./R/dynamic_crash_summaries.Rmd", output_file = "./html/dynamic_crash_summaries.html")'
 
 MilWALKeeWalks: R/MilWALKeeWalks.Rmd
 	R -e 'library("rmarkdown"); old_path <- Sys.getenv("PATH"); Sys.setenv(PATH = paste(old_path, "/usr/local/bin", sep = ":")); rmarkdown::render(knit_root_dir = "../", output_dir = "./html", input = "./R/MilWALKeeWalks.Rmd", output_file = "./html/MilWALKeeWalks.html")'

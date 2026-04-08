@@ -52,7 +52,7 @@ county_summaries <- TOPS_data %>%
 #county_focus <- "MILWAUKEE"
 county_focus <- unique(county_summaries %>% pull(CNTYNAME))
 
-injury_focus <- c("Suspected Minor Injury", "Suspected Serious Injury", "Fatality")
+injury_focus <- c("Suspected Serious Injury", "Fatality")
 
 wisconsin_crash_summary <- ggplotly(
 ggplot(data = county_summaries %>% 
@@ -68,81 +68,105 @@ ggplot(data = county_summaries %>%
   labs(title = "People walking and biking injured in car crashes in Wisconsin")
 )
 
-saveWidget(wisconsin_crash_summary, file = "figures/dynamic_crash_summaries/wisconsin_crash_summary.html", 
+dynamic_crash_summary_dir <- "figures/dynamic_crash_summaries/"
+if(!dir.exists(dynamic_crash_summary_dir)){dir.create(dynamic_crash_summary_dir)}
+saveWidget(wisconsin_crash_summary, 
+           file = paste0(dynamic_crash_summary_dir,"wisconsin_crash_summary.html"), 
            selfcontained = TRUE,
            title = "Wisconsin Crash Summary")
 ```
 
 ```{r makeGraphsDropdown, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
-# Create a list to store plotly objects for each county, including "All of Wisconsin"
-county_plots <- list()
-
-# Generate plot for "All of Wisconsin"
-all_wisconsin_data <- county_summaries %>%
-  filter(ped_inj_name %in% injury_focus) %>%
-  group_by(year, ped_inj_name) %>%
-  summarize(count = n()) %>%
-  mutate(Year = year, "Injury severity" = ped_inj_name, "Number of crashes" = count)
-
-p_all_wisconsin <- ggplot(all_wisconsin_data, aes(x = Year, y = `Number of crashes`, fill = `Injury severity`)) +
-  geom_col() +
-  scale_fill_manual(values = injury_severity_pal(injury_severity %>% filter(InjSevName %in% injury_focus) %>% pull(InjSevName))) +
-  labs(title = "People walking and biking injured in car crashes in all of Wisconsin") +
-  theme_minimal()
-
-county_plots[["All of Wisconsin"]] <- ggplotly(p_all_wisconsin)
-
-# Iterate over each unique county to create plotly objects
-for (county in unique(county_summaries$CNTYNAME)) {
-  plot_data <- county_summaries %>%
-    filter(CNTYNAME == county) %>%
-    filter(ped_inj_name %in% injury_focus) %>%
-    mutate(Year = year, "Injury severity" = ped_inj_name, "Number of crashes" = count)
+# 1. Prepare Data: Combine "All of Wisconsin" with individual counties
+all_wi <- county_summaries |> 
+  filter(ped_inj_name %in% injury_focus) |> 
+  group_by(year, ped_inj_name) |> 
+  summarize(count = n(), .groups = "drop") |> 
+  mutate(CNTYNAME = "All of Wisconsin")
   
-  p <- ggplot(plot_data, aes(x = Year, y = `Number of crashes`, fill = `Injury severity`)) +
-    geom_col() +
-    scale_fill_manual(values = injury_severity_pal(injury_severity %>% filter(InjSevName %in% injury_focus) %>% pull(InjSevName))) +
-    labs(title = paste("People walking and biking injured in car crashes in", county, "County")) +
-    theme_minimal()
+plot_data <- county_summaries |> 
+  filter(ped_inj_name %in% injury_focus) |> 
+  mutate(CNTYNAME = paste0(str_to_title(CNTYNAME), " County")) |> 
+  bind_rows(all_wi) |> 
+  mutate(Year = year, `Injury severity` = ped_inj_name, `Number of crashes` = count) |> 
+  ungroup()
   
-  county_plots[[county]] <- ggplotly(p)
+# 2. Ensure uniform data structure (so every county has the exact same number of traces)
+plot_data_complete <- plot_data %>%
+  tidyr::complete(CNTYNAME, Year, `Injury severity` = injury_focus, fill = list(`Number of crashes` = 0))
+  
+# 3. Setup lists and fetch correct palette colors
+county_list <- c("All of Wisconsin", sort(setdiff(unique(plot_data_complete$CNTYNAME), "All of Wisconsin")))
+severity_colors <- injury_severity_pal(injury_focus)
+names(severity_colors) <- injury_focus
+
+# 4. Build the base Plotly graph
+p <- plot_ly()
+
+for (county in county_list) {
+  c_data <- plot_data_complete %>% filter(CNTYNAME == county)
+  
+  for (severity in rev(injury_focus)) {
+    sev_data <- c_data %>% filter(`Injury severity` == severity)
+    
+    # Add a trace for every combination. 
+    p <- p %>% add_bars(
+      x = sev_data$Year,
+      y = sev_data$`Number of crashes`,
+      name = severity,
+      legendgroup = severity,
+      marker = list(color = severity_colors[[severity]]),
+      showlegend = (county == "All of Wisconsin"),
+      visible = (county == "All of Wisconsin"),
+      hovertemplate = paste0(severity, ": %{y}<extra></extra>") 
+    )
+  }
 }
 
-# Render HTML with JavaScript to switch between plots
-html_output <- tags$html(
-  tags$head(
-    tags$title("County Crash Summary"),
-    tags$script(
-      HTML("
-        function showPlot(county) {
-          var plots = document.getElementsByClassName('county-plot');
-          for (var i = 0; i < plots.length; i++) {
-            plots[i].style.display = 'none';
-          }
-          document.getElementById(county).style.display = 'block';
-        }
-        window.onload = function() {
-          showPlot('All of Wisconsin'); // Default to 'All of Wisconsin'
-        }
-      ")
-    )
-  ),
-  tags$body(
-    tags$h1("County Crash Summary"),
-    tags$select(onchange = "showPlot(this.value)",
-                lapply(names(county_plots), function(county) {
-                  tags$option(value = county, county)
-                })
+# 5. Create the native Plotly dropdown visibility logic
+dropdown_buttons <- lapply(seq_along(county_list), function(i) {
+  
+  # Create a vector of FALSE for all traces in the graph
+  visibility_vector <- rep(FALSE, length(county_list) * length(injury_focus))
+  
+  # Turn TRUE only for the traces belonging to the currently selected county
+  start_idx <- (i - 1) * length(injury_focus) + 1
+  end_idx <- i * length(injury_focus)
+  visibility_vector[start_idx:end_idx] <- TRUE
+  
+  list(
+    method = "update",
+    args = list(
+      list(visible = visibility_vector), # Toggles the bars
+      list(title = paste("People walking and biking injured in car crashes in", county_list[i]))
     ),
-    lapply(names(county_plots), function(county) {
-      tags$div(id = county, class = "county-plot", style = "display:none;", county_plots[[county]])
-    })
+    label = county_list[i]
+  )
+})
+
+# 6. Apply dropdown to the layout
+p <- p %>% layout(
+  title = "People walking and biking injured in car crashes in All of Wisconsin",
+  barmode = "stack",
+  xaxis = list(title = "Year", tickformat = "d"),
+  yaxis = list(title = "Number of crashes"),
+  updatemenus = list(
+    list(
+      active = 0,
+      y = 1.15,
+      x = 0.0,
+      buttons = dropdown_buttons
+    )
   )
 )
 
-# Save the output to an HTML file
-save_html(html_output, file = "figures/dynamic_crash_summaries/county_crash_summaries.html")
+# 7. Save natively as a standalone widget! No hacks required.
+saveWidget(
+  p, 
+  file = "figures/dynamic_crash_summaries/county_crash_summaries.html", 
+  selfcontained = TRUE,
+  title = "County Crash Summaries"
+)
 
-# Open the file in a web browser
 browseURL("figures/dynamic_crash_summaries/county_crash_summaries.html")
 ```
