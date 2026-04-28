@@ -1,0 +1,220 @@
+---
+title: "Crash Data Summaries"
+output:
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+editor_options:
+  chunk_output_type: console
+---
+
+
+# Input Data & Configuration
+
+## Libraries
+```{r libs, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+date()
+library(tidyverse)
+library(ggmap)
+library(sf)
+library(ggnewscale)
+library(RColorBrewer)
+library(tidycensus)
+```
+
+## Load TOPS data
+```{r loadTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+load(file = "data/TOPS/TOPS_data.Rda")
+load(file = "data/TOPS/vuln_roles.Rda")
+load(file = "data/TOPS/retrieve_date.Rda")
+load(file = "data/TOPS/injury_severity.Rda")
+```
+
+## Make TOPS data type sf
+```{r sfTOPS, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+TOPS_data_sf <- TOPS_data |> 
+  filter_out(is.na(longitude),
+             is.na(latitude)) |> 
+  st_as_sf(coords = c("longitude", "latitude"),
+           crs = 4326)
+```
+
+## Load API keys from StadiaMaps and the census
+```{r APIkeys, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+# register stadia API key ----
+register_stadiamaps(key = substr(read_file(file = "api_keys/stadia_api_key"), 1, 36))
+
+# load census api key ----
+census_api_key(key = substr(read_file(file = "api_keys/census_api_key"), 1, 40))
+```
+
+## Fetch Census Demographics
+```{r get_census, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+# Define the ACS variables
+# B19013_001: Median Household Income
+# B17001_001: Total population for poverty status
+# B17001_002: Population below poverty level
+# B03002_001: Total population for race/ethnicity
+# B03002_003: White alone, not Hispanic or Latino
+
+acs_vars <- c(
+  med_income = "B19013_001",
+  pop_total = "B03002_001",
+  pop_white_nh = "B03002_003",
+  poverty_total = "C17002_001",
+  poverty_under_050 = "C17002_002",
+  poverty_050_to_099 = "C17002_003"
+)
+
+# Fetch spatial data from the ACS
+census_data <- get_acs(
+  geography = "block group",
+  variables = acs_vars,
+  state = "WI",
+  county = "Dane",
+  year = 2023,
+  geometry = TRUE,
+  output = "wide"
+)
+
+```
+
+### 2. Processing and Standardizing the Geometries
+
+When `tidycensus` downloads data in "wide" format, it appends an "E" (Estimate) and an "M" (Margin of Error) to your variable names. We'll calculate the poverty and POC (People of Color) percentages using the estimates. 
+
+Crucially, the Census data defaults to the NAD83 coordinate reference system (CRS 4269). We must transform it to WGS84 (CRS 4326) to match the `TOPS_data_sf` spatial object you created earlier.
+
+## Process Demographics and Transform CRS
+```{r process_census, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+census_demographics <- census_data |>
+  mutate(
+    # 1. Add the two brackets together to get total population below poverty
+    poverty_below_total = poverty_under_050E + poverty_050_to_099E,
+    
+    # 2. Calculate percentages, avoiding division by zero
+    pct_poverty = if_else(poverty_totalE > 0, (poverty_below_total / poverty_totalE) * 100, 0),
+    pct_poc = if_else(pop_totalE > 0, ((pop_totalE - pop_white_nhE) / pop_totalE) * 100, 0)
+  ) |>
+  # 3. Select only the columns we need for mapping
+  select(
+    GEOID, 
+    NAME, 
+    med_income = med_incomeE, 
+    pct_poverty, 
+    pct_poc, 
+    pop_total = pop_totalE,
+    geometry
+  ) |> 
+  # 4. Transform CRS to match TOPS_data_sf (EPSG: 4326)
+  st_transform(4326)
+  
+```
+
+### 3. Creating the Overlay Map
+
+Now that your spatial polygons (`census_demographics`) and your points (`TOPS_data_sf`) share the same coordinate system, you can layer them in `ggplot2`. Here is a basic starter chunk for mapping poverty percentages beneath your crash points.
+
+## Map: Poverty and Crash Locations
+```{r map_poverty, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+ggplot() +
+  # Base layer: Census tracts colored by poverty percentage
+  geom_sf(data = census_demographics, aes(fill = pct_poverty), color = "white", size = 0.2) +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "% Below Poverty") +
+  
+  # Next layer: Crash points
+  geom_sf(data = TOPS_data_sf |> filter(ped_inj %in% c("K", "A", "B")), 
+          color = "black", 
+          size = 1, 
+          alpha = 0.6) +
+  
+  # Formatting
+  theme_void() +
+  labs(
+    title = "Bike and Pedestrian Crashes by Tract Poverty Level",
+    subtitle = "Crash points overlaying ACS 5-Year Estimates"
+  )
+```
+
+## Map: Madison Poverty and Crash Locations
+```{r map_madison, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+# Define a bounding box for Madison, WI
+madison_bbox <- c(left = -89.56, bottom = 42.98, right = -89.23, top = 43.18)
+
+# Fetch the Stadia basemap 
+# "stamen_toner_lite" provides a muted background that makes data pop
+madison_basemap <- get_stadiamap(
+  bbox = madison_bbox, 
+  zoom = 12, 
+  maptype = "stamen_toner_lite"
+)
+
+# Build the layered map
+ggmap(madison_basemap) +
+  # Layer 1: Census tracts colored by poverty percentage 
+  # Note: inherit.aes = FALSE is crucial when mixing ggmap and geom_sf
+  geom_sf(data = census_demographics, 
+          inherit.aes = FALSE, 
+          aes(fill = pct_poverty), 
+          color = "gray90", size = 0.2, alpha = 0.5) +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "% Below\npoverty line") +
+  
+  # Layer 2: TOPS Crash points
+  geom_sf(data = TOPS_data_sf |> filter(ped_inj %in% c("K", "A", "B")), 
+          inherit.aes = FALSE, 
+          color = "black", size = 0.8, alpha = 0.6) +
+  
+  # Layer 3: Lock the view to Madison's limits using the bbox coordinates
+  coord_sf(xlim = c(madison_bbox["left"], madison_bbox["right"]), 
+           ylim = c(madison_bbox["bottom"], madison_bbox["top"]),
+           crs = 4326) +
+  
+  # Formatting
+  theme_void() +
+  theme(legend.position = "right") +
+  labs(
+    title = "Madison bike and pedestrian crashes w/ poverty rates",
+    subtitle = "Crashes that were fatal or caused injuries - 2017-2025"
+  )
+ggsave(filename = "figures/madison_poverty.pdf",
+       width = 11,
+       height = 8.5,
+       units = "in",
+       dpi = 300)
+
+
+ggmap(madison_basemap) +
+  # Layer 1: Census tracts colored by percentage people of color
+  # Note: inherit.aes = FALSE is crucial when mixing ggmap and geom_sf
+  geom_sf(data = census_demographics, 
+          inherit.aes = FALSE, 
+          aes(fill = pct_poc), 
+          color = "gray90", size = 0.2, alpha = 0.5) +
+  scale_fill_distiller(palette = "Blues", direction = 1, name = "% people of color") +
+  
+  # Layer 2: TOPS Crash points
+  geom_sf(data = TOPS_data_sf |> filter(ped_inj %in% c("K", "A", "B")), 
+          inherit.aes = FALSE, 
+          color = "black", size = 0.8, alpha = 0.6) +
+  
+  # Layer 3: Lock the view to Madison's limits using the bbox coordinates
+  coord_sf(xlim = c(madison_bbox["left"], madison_bbox["right"]), 
+           ylim = c(madison_bbox["bottom"], madison_bbox["top"]),
+           crs = 4326) +
+  
+  # Formatting
+  theme_void() +
+  theme(legend.position = "right") +
+  labs(
+    title = "Madison bike and pedestrian crashes w/ race",
+    subtitle = "Crashes that were fatal or caused injuries - 2017-2025"
+  )
+ggsave(filename = "figures/madison_race.pdf",
+       width = 11,
+       height = 8.5,
+       units = "in",
+       dpi = 300)
+```
