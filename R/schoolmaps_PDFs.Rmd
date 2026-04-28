@@ -27,6 +27,7 @@ library(ggnewscale)
 library(RColorBrewer)
 library(magick)
 library(rsvg)
+library(cowplot)
 library(furrr)
 run_parameters <- read_yaml("parameters/run_parameters.yaml")
 ```
@@ -307,32 +308,6 @@ generate_school_maps <- function(district) {
       300,
       school_symbol
       )
-    # Bike Fed logo
-    # Adjustable parameters
-    # Logo height as % of map height
-    logo_height_pct <- 0.16
-    # Gap between right map edge and logo
-    offset_from_right_pct <- 0.05
-    
-    # Convert to meters
-    logo_height_deg <- ((bbox['top'] - bbox['bottom']) * logo_height_pct)
-    logo_height_meters <- logo_height_deg * 111320
-
-    # Calculate center latitude
-    logo_center_lat <- bbox['top'] - (bbox['top'] - bbox['bottom']) * (logo_height_pct / 2)
-    
-    # Calculate the logo width in degrees
-    logo_width_deg <- logo_height_deg / cos(logo_center_lat * pi / 180)
-    
-    # Calculate center longitude: right edge + offset + half the logo width
-    logo_center_lon <- bbox['right'] + (bbox['right'] - bbox['left']) * offset_from_right_pct + logo_width_deg / 2
-    
-    # Get square bounds
-    bikefed_bounds <- get_logo_bounds(
-      logo_center_lon, 
-      logo_center_lat, 
-      logo_height_meters,
-      bikefed_logo)
     
     # generate map
     school_map <- ggmap(basemap)
@@ -390,15 +365,6 @@ generate_school_maps <- function(district) {
                     nudge_y = 0.0015,
                     linewidth = 0.04,
                     size = 2) +
-      # Add Bike Fed logo in top right
-      annotation_raster(bikefed_logo,
-                        ymin = bikefed_bounds$ymin,
-                        ymax = bikefed_bounds$ymax,
-                        xmin = bikefed_bounds$xmin,
-                        xmax = bikefed_bounds$xmax
-                        ) +
-      coord_sf(clip = "off") +
-      # add crash locations
       new_scale_fill() +
       geom_sf(data = TOPS_data_sf |>
                 st_filter(st_as_sfc(bbox)) |> 
@@ -414,6 +380,17 @@ generate_school_maps <- function(district) {
               size = 3,
               alpha = 0.8) +
       scale_fill_manual(values = setNames(injury_severity$color, injury_severity$InjSevName), name = "Crash Severity")
+    
+    # Add Bike Fed logo
+    school_map <- cowplot::ggdraw(school_map) +
+      cowplot::draw_image(
+        bikefed_logo, 
+        x = 0.9, 
+        y = 1.4,
+        hjust = 1, 
+        vjust = 1,
+        width = 0.1
+      )
     
     # Save map
     ggsave(school_map,
