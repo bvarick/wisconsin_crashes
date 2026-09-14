@@ -22,6 +22,10 @@ library(RColorBrewer)
 library(tidycensus)
 library(ggrepel)
 library(leaflet)
+library(pals)
+library(tidycensus)
+library(sf)
+
 ```
 
 ## Load TOPS data
@@ -34,11 +38,32 @@ injury_severity_pal <- colorFactor(palette = injury_severity$color, levels = inj
 
 ```
 
+## Load Census data
+```{r censusdata, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+# add population census data
+census_api_key(key = substr(read_file(file = "api_keys/census_api_key"), 1, 40))
+county_populations <- get_estimates(geography = "county", year = 2024, product = "population", state = "Wisconsin", geometry = TRUE) %>%
+  filter(variable == "POPESTIMATE") %>%
+  mutate(County = str_to_upper(str_replace(NAME, " County, Wisconsin", "")))
+county_populations <- st_transform(county_populations, crs = 4326)
+```
+
 ## Set parameters
 ```{r parameters, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
 county_focus <- c("MILWAUKEE")
 municipality_focus <- c("MILWAUKEE")
-injury_severy_focus <- c("A", "K")
+injury_severy_focus <- c("A", "K", "B")
+```
+
+## Set figure boilerplate
+```{r figureBoilerplate, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+
+caption_text <- paste0("crash data from UW TOPS lab - retrieved ",
+                       strftime(retrieve_date, format = "%m/%Y"),
+                       " per direction of the WisDOT Bureau of Transportation Safety")
+
+caption_theme <- theme(axis.text.x = element_text(angle = 30, hjust = 1),
+                       plot.caption = element_text(color = "grey"))
 ```
 
 ## build data summaries for city
@@ -179,7 +204,7 @@ data_summary_county[["crashes_by_hitrun"]] <- TOPS_data |>
   pivot_wider(names_from = HITRUN, values_from = count) |> 
   rename(HitandRun = Y, noHitandRun = "NA") |> 
   mutate(total = (HitandRun + noHitandRun),
-           percent_hitandrun = round(HitandRun / total * 100, 2))
+         percent_hitandrun = round(HitandRun / total * 100, 2))
 
 
 data_summary_county[["crashes_by_vehicletype"]] <- TOPS_data |>
@@ -197,7 +222,7 @@ data_summary_county[["crashes_by_vehicletype"]] <- TOPS_data |>
   mutate(car_percent = round(CAR/total * 100, 2),
          suv_percent = round(SUV/total * 100, 2),
          pickup_percent = round(`UT TRK`/total * 100, 2)
-         )
+  )
 ## export csv files for county ----
 
 # make directories for county summaries
@@ -229,9 +254,7 @@ data_summary_county[["crash_by_age"]] |>
        x = "Year",
        y = "Total crashes",
        fill = "Injury Severity",
-       caption = paste0("crash data from UW TOPS lab - retrieved ",
-                        strftime(retrieve_date, format = "%m/%Y"),
-                        " per direction of the WisDOT Bureau of Transportation Safety")) +
+       caption = caption_text) +
   theme(plot.caption = element_text(color = "grey"))
 ggsave(file = paste0(county_directory, county_focus, "_youth_crashes.pdf"),
        height = 8.5,
@@ -249,9 +272,34 @@ TOPS_data |>
 
 ## Make figures for statewide summaries
 ```{r statesummary, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+county_focus_top <- c(
+  "Milwaukee",
+  "Racine",
+  "Kenosha",
+  "Dane",
+  "Winnebago",
+  "Rock",
+  "Fond du Lac",
+  "Brown",
+  "Eau Claire",
+  "La Crosse",
+  "Outagamie",
+  "Marathon",
+  "Waukesha",
+  "Sauk",
+  "Douglas"
+)
+county_focus_top <- str_to_upper(county_focus_top)
+
+## ---- All 15 counties together
+
+top15_subtitle <- paste0("Crashes in top 15 counties - Wisconsin - 2017-", year(max(TOPS_data$date)))
+top15_filename <- paste0("figures/crash_summaries/state/top15combined/")
+
 TOPS_data |>
+  filter(CNTYNAME %in% county_focus_top) |> 
   filter(!is.na(vulnerable_role)) |>
-  filter(vulnerable_role == "Pedestrian") |>
+  #filter(vulnerable_role == "Pedestrian") |>
   mutate(driver_vehtype = ifelse(ROLE1 %in% c("DR"), VEHTYPE1, ifelse(ROLE2 %in% c("DR"), VEHTYPE2, NA))) |>
   filter(driver_vehtype %in% c("CAR", "SUV", "UT TRK")) |>
   group_by(vulnerable_role, ped_inj_name, driver_vehtype) |>
@@ -266,29 +314,29 @@ TOPS_data |>
   mutate(Car = car_percent, SUV = suv_percent, "Pickup Truck" = pickup_percent) |>
   pivot_longer(cols = c(Car, SUV, "Pickup Truck")) |>
   ggplot(aes(x = ped_inj_name,
-               y = value,
-               fill = name)) +
+             y = value,
+             fill = name)) +
   geom_col(position = position_stack()) +
+  facet_grid(vulnerable_role ~ .) +
   geom_text(aes(label = paste0(round(value, 1), "%")),
             position = position_stack(vjust = 0.5)) +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1),
-        plot.caption = element_text(color = "grey")) +
+  caption_theme +
   scale_y_continuous(expand = expansion(mult = c(0, 0))) +
   labs(title = "Impact of type of vehicle on severity of injury",
-       subtitle = paste0("Crashes statewide - Wisconsin - 2017-", year(max(TOPS_data$date))),
+       subtitle = top15_subtitle,
        y = "Percent of crashes",
        x = "Severity of injury",
        fill = "Type of vehicle",
-       caption = paste0("crash data from UW TOPS lab - retrieved ",
-                        strftime(retrieve_date, format = "%m/%Y"),
-                        " per direction of the WisDOT Bureau of Transportation Safety"))
-ggsave(file = paste0("figures/crash_summaries/state/", "VehType_InjSev.pdf"),
+       caption = caption_text
+  )
+ggsave(file = paste0(top15_filename, "VehType_InjSev.pdf"),
        height = 8.5,
        width = 11,
        units = "in")
 
 
 TOPS_data |>
+  filter(CNTYNAME %in% county_focus_top) |> 
   filter(!is.na(vulnerable_role)) |>
   filter(vulnerable_role == "Pedestrian") |>
   filter(ped_inj %in% injury_severy_focus) |>
@@ -299,36 +347,545 @@ TOPS_data |>
   pivot_wider(names_from = driver_vehtype, values_from = count) |>
   ungroup() |>
   mutate(total = (CAR + SUV + `UT TRK`)) |>
-  mutate(car_percent = CAR/total * 100,
-         suv_percent = SUV/total * 100,
-         pickup_percent = `UT TRK`/total * 100) |>
-  select(year, vulnerable_role, car_percent, suv_percent, pickup_percent) |>
-  pivot_longer(cols = c(car_percent, suv_percent, pickup_percent)) |>
+  mutate(car = CAR/total * 100,
+         suv = SUV/total * 100,
+         pickup = `UT TRK`/total * 100) |>
+  select(year, vulnerable_role, car, suv, pickup) |>
+  pivot_longer(cols = c(car, suv, pickup)) |>
   ggplot() +
   geom_line(aes(x = as.double(as.character(year)),
-               y = value,
-               color = name))
+                y = value,
+                color = name)) +
+  caption_theme +
+  labs(title = "Type of cars involved in crashes over time",
+       subtitle = top15_subtitle,
+       x = "Year",
+       y = "Percent of total",
+       color = "Type of Car",
+       caption = caption_text
+  )
+ggsave(file = paste0(top15_filename, "VehType_year.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
 
-TOPS_data |>
-  filter(CNTYNAME %in% county_focus,
-         vulnerable_role == "Pedestrian",
-         ped_inj %in% injury_severy_focus) |>
-  mutate(driver_vehtype = ifelse(ROLE1 %in% c("DR"), VEHTYPE1, ifelse(ROLE2 %in% c("DR"), VEHTYPE2, NA))) |>
-  mutate(driver_vehtype = case_when(driver_vehtype %in% c("CAR", "SUV", "UT TRK") ~ driver_vehtype,
-                                    TRUE ~ "other")) |> 
-  group_by(CNTYNAME, vulnerable_role, ped_inj_name, driver_vehtype, year) |>
-  summarise(count = n_distinct(DOCTNMBR)) |>
-  pivot_wider(names_from = driver_vehtype, values_from = count) |>
-  rowwise() |> 
-  mutate(total = sum(c(CAR, SUV, `UT TRK`, other), na.rm = TRUE)) |>
-  mutate(car_percent = CAR/total * 100,
-         suv_percent = SUV/total * 100,
-         pickup_percent = `UT TRK`/total * 100) |>
-  select(year, vulnerable_role, car_percent, suv_percent, pickup_percent) |>
-  pivot_longer(cols = c(car_percent, suv_percent, pickup_percent)) |>
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
   ggplot() +
-  geom_line(aes(x = as.double(as.character(year)),
+  geom_histogram(
+    aes(vulnerable_age,
+        fill = ped_inj_name),
+    binwidth = 5
+  ) +
+  facet_grid(vulnerable_role ~ .) +
+  caption_theme +
+  labs(x = "Age of vulnerable road user",
+       y = "Number of crashes",
+       fill = "Severity of crash",
+       title = "Age of vulnerable road user",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  )
+ggsave(file = paste0(top15_filename, "VulnAge_InjSev.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% c("A", "K")) |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  ggplot() +
+  geom_histogram(
+    aes(vulnerable_age,
+        fill = ped_inj_name),
+    binwidth = 5
+  ) +
+  facet_grid(vulnerable_role ~ .) +
+  caption_theme +
+  labs(x = "Age of vulnerable road user",
+       y = "Number of crashes",
+       fill = "Severity of crash",
+       title = "Age of vulnerable road user",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  )
+ggsave(file = paste0(top15_filename, "VulnAge_InjSev_AK.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(driver_action = ifelse(ROLE1 %in% vuln_roles, DRVRDOIN2, ifelse(ROLE2 %in% vuln_roles, DRVRDOIN1, NA))) |>
+  group_by(driver_action, ped_inj_name, vulnerable_role) |> 
+  summarise(count = n()) |> 
+  ggplot() +
+  geom_col(aes(
+    x = driver_action,
+    y = count,
+    fill = ped_inj_name
+  )) +
+  facet_grid(vulnerable_role ~ .) +
+  caption_theme +
+  labs(x = "Driver Action",
+       y = "Number of crashes",
+       fill = "Severity of crash",
+       title = "Most common driver actions in bike/ped crashes",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(top15_filename, "DriverAction.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(crash_time = ymd_hm(paste0("2026-01-01", str_pad(CRSHTIME, width = 4, side = "left", pad = "0")))) |> 
+  ggplot() +
+  geom_histogram(
+    aes(
+      x = crash_time,
+      fill = ped_inj_name
+    )
+  ) +
+  facet_grid(vulnerable_role ~ .) +
+  scale_x_datetime(date_labels = "%H:%M") +
+  caption_theme +
+  labs(x = "Time of Day",
+       y = "Number of crashes",
+       fill = "Severity of crash",
+       title = "Time of day in bike/ped crashes",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(top15_filename, "TimeOfDay.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+## ---- Individual county figures
+
+for (county in county_focus_top){
+  county_subtitle <- paste0("Crashes in ", 
+                            str_to_title(county), 
+                            " County, Wisconsin - 2017-", 
+                            year(max(TOPS_data$date))
+  )
+  
+  county_filename_start <- paste0("figures/crash_summaries/state/bycounty/", county,"_")
+  
+  TOPS_data |>
+    filter(CNTYNAME %in% county) |> 
+    filter(!is.na(vulnerable_role)) |>
+    #filter(vulnerable_role == "Pedestrian") |>
+    mutate(driver_vehtype = ifelse(ROLE1 %in% c("DR"), VEHTYPE1, ifelse(ROLE2 %in% c("DR"), VEHTYPE2, NA))) |>
+    filter(driver_vehtype %in% c("CAR", "SUV", "UT TRK")) |>
+    group_by(vulnerable_role, ped_inj_name, driver_vehtype) |>
+    summarise(count = n_distinct(DOCTNMBR)) |>
+    pivot_wider(names_from = driver_vehtype, values_from = count) |>
+    ungroup() |>
+    mutate(total = (CAR + SUV + `UT TRK`)) |>
+    mutate(car_percent = CAR/total * 100,
+           suv_percent = SUV/total * 100,
+           pickup_percent = `UT TRK`/total * 100) |>
+    select(vulnerable_role, ped_inj_name, car_percent, suv_percent, pickup_percent) |>
+    mutate(Car = car_percent, SUV = suv_percent, "Pickup Truck" = pickup_percent) |>
+    pivot_longer(cols = c(Car, SUV, "Pickup Truck")) |>
+    ggplot(aes(x = ped_inj_name,
                y = value,
-               color = name))
+               fill = name)) +
+    geom_col(position = position_stack()) +
+    facet_grid(vulnerable_role ~ .) +
+    geom_text(aes(label = paste0(round(value, 1), "%")),
+              position = position_stack(vjust = 0.5)) +
+    caption_theme +
+    scale_y_continuous(expand = expansion(mult = c(0, 0))) +
+    labs(title = "Impact of type of vehicle on severity of injury",
+         subtitle = county_subtitle,
+         y = "Percent of crashes",
+         x = "Severity of injury",
+         fill = "Type of vehicle",
+         caption = caption_text)
+  ggsave(file = paste0(county_filename_start, "VehType_InjSev.pdf"),
+         height = 8.5,
+         width = 11,
+         units = "in")
+  
+  
+  TOPS_data |>
+    filter(CNTYNAME %in% county) |> 
+    filter(!is.na(vulnerable_role)) |>
+    filter(vulnerable_role == "Pedestrian") |>
+    filter(ped_inj %in% injury_severy_focus) |>
+    mutate(driver_vehtype = ifelse(ROLE1 %in% c("DR"), VEHTYPE1, ifelse(ROLE2 %in% c("DR"), VEHTYPE2, NA))) |>
+    filter(driver_vehtype %in% c("CAR", "SUV", "UT TRK")) |>
+    group_by(vulnerable_role, driver_vehtype, year) |>
+    summarise(count = n_distinct(DOCTNMBR)) |>
+    pivot_wider(names_from = driver_vehtype, values_from = count) |>
+    ungroup() |>
+    mutate(total = (CAR + SUV + `UT TRK`)) |>
+    mutate(car = CAR/total * 100,
+           suv = SUV/total * 100,
+           pickup = `UT TRK`/total * 100) |>
+    select(year, vulnerable_role, car, suv, pickup) |>
+    pivot_longer(cols = c(car, suv, pickup)) |>
+    ggplot() +
+    geom_line(aes(x = as.double(as.character(year)),
+                  y = value,
+                  color = name)) +
+    caption_theme +
+    labs(title = "Type of cars involved in crashes over time",
+         subtitle = county_subtitle,
+         x = "Year",
+         y = "Percent of total",
+         color = "Type of Car",
+         caption = caption_text)
+  ggsave(file = paste0(county_filename_start, "VehType_year.pdf"),
+         height = 8.5,
+         width = 11,
+         units = "in")
+  
+  TOPS_data |> 
+    filter(CNTYNAME %in% county) |> 
+    filter(ped_inj %in% injury_severy_focus) |> 
+    mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+    ggplot() +
+    geom_histogram(
+      aes(vulnerable_age,
+          fill = ped_inj_name),
+      binwidth = 5
+    ) +
+    facet_grid(vulnerable_role ~ .) +
+    caption_theme +
+    labs(x = "Age of vulnerable road user",
+         y = "Number of crashes",
+         fill = "Severity of crash",
+         title = "Age of vulnerable road user",
+         subtitle = county_subtitle,
+         caption = caption_text
+    )
+  ggsave(file = paste0(county_filename_start, "VulnAge_InjSev.pdf"),
+         height = 8.5,
+         width = 11,
+         units = "in")
+  
+  TOPS_data |> 
+    filter(CNTYNAME %in% county) |> 
+    filter(ped_inj %in% c("A", "K")) |> 
+    mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+    ggplot() +
+    geom_histogram(
+      aes(vulnerable_age,
+          fill = ped_inj_name),
+      binwidth = 5
+    ) +
+    facet_grid(vulnerable_role ~ .) +
+    caption_theme +
+    labs(x = "Age of vulnerable road user",
+         y = "Number of crashes",
+         fill = "Severity of crash",
+         title = "Age of vulnerable road user",
+         subtitle = county_subtitle,
+         caption = caption_text
+    )
+  ggsave(file = paste0(county_filename_start, "VulnAge_InjSev_AK.pdf"),
+         height = 8.5,
+         width = 11,
+         units = "in")
+  
+  TOPS_data |> 
+    filter(CNTYNAME %in% county) |> 
+    filter(ped_inj %in% injury_severy_focus) |> 
+    mutate(driver_action = ifelse(ROLE1 %in% vuln_roles, DRVRDOIN2, ifelse(ROLE2 %in% vuln_roles, DRVRDOIN1, NA))) |>
+    group_by(driver_action, ped_inj_name, vulnerable_role) |> 
+    summarise(count = n()) |> 
+    ggplot() +
+    geom_col(aes(
+      x = driver_action,
+      y = count,
+      fill = ped_inj_name
+    )) +
+    facet_grid(vulnerable_role ~ .) +
+    caption_theme +
+    labs(x = "Driver Action",
+         y = "Number of crashes",
+         fill = "Severity of crash",
+         title = "Most common driver actions in bike/ped crashes",
+         subtitle = county_subtitle,
+         caption = caption_text
+    ) +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1))
+  ggsave(file = paste0(county_filename_start, "DriverAction.pdf"),
+         height = 8.5,
+         width = 11,
+         units = "in")
+  
+  TOPS_data |> 
+    filter(CNTYNAME %in% county) |> 
+    filter(ped_inj %in% injury_severy_focus) |> 
+    mutate(crash_time = ymd_hm(paste0("2026-01-01", str_pad(CRSHTIME, width = 4, side = "left", pad = "0")))) |> 
+    ggplot() +
+    geom_histogram(
+      aes(
+        x = crash_time,
+        fill = ped_inj_name
+      )
+    ) +
+    facet_grid(vulnerable_role ~ .) +
+    scale_x_datetime(date_labels = "%H:%M") +
+    caption_theme +
+    labs(x = "Time of Day",
+         y = "Number of crashes",
+         fill = "Severity of crash",
+         title = "Time of day in bike/ped crashes",
+         subtitle = county_subtitle,
+         caption = caption_text
+    ) +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1))
+  ggsave(file = paste0(county_filename_start, "TimeOfDay.pdf"),
+         height = 8.5,
+         width = 11,
+         units = "in")
+}
+
+## County comparisons
+county_compare_filename <- paste0("figures/crash_summaries/state/county_compare/")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  ggplot() +
+  geom_violin(
+    aes(y = vulnerable_age,
+        x = CNTYNAME,
+        fill = CNTYNAME
+    )
+  ) +
+  scale_fill_manual(values=unname(glasbey()), guide = NULL) +
+  facet_grid(vulnerable_role ~ .) +
+  caption_theme +
+  labs(x = "County",
+       y = "Age of vulnerable road user",
+       title = "Age of vulnerable road user - all injuries",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  )
+ggsave(file = paste0(county_compare_filename, "VulnAge_InjSev.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% c("A", "K")) |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  ggplot() +
+  geom_violin(
+    aes(y = vulnerable_age,
+        x = CNTYNAME,
+        fill = CNTYNAME
+    )
+  ) +
+  scale_fill_manual(values=unname(glasbey()), guide = NULL) +
+  facet_grid(vulnerable_role ~ .) +
+  caption_theme +
+  labs(x = "County",
+       y = "Age of vulnerable road user",
+       title = "Age of vulnerable road user - severe injuries and fatalities",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  )
+ggsave(file = paste0(county_compare_filename, "VulnAge_InjSev_AK.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+driver_actions <- c("BACKING",
+                    "GO STR",
+                    "LT TRN",
+                    "RT TRN",
+                    "UNKN",
+                    NA)
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(driver_action = ifelse(ROLE1 %in% vuln_roles, DRVRDOIN2, ifelse(ROLE2 %in% vuln_roles, DRVRDOIN1, NA))) |>
+  filter(driver_action %in% driver_actions) |> 
+  group_by(driver_action,vulnerable_role, CNTYNAME) |> 
+  summarise(count = n(), .groups = "drop") |> 
+  group_by(CNTYNAME) |> 
+  mutate(pct = (count / sum(count)) * 100) |> 
+  ggplot() +
+  geom_col(aes(
+    x = driver_action,
+    y = pct,
+    fill = CNTYNAME
+  ),
+  position = position_dodge()) +
+  scale_fill_manual(values=unname(glasbey())) +
+  facet_grid(vulnerable_role ~ .) +
+  caption_theme +
+  labs(x = "Driver Action",
+       y = "Percent of county's crashes",
+       fill = "County",
+       title = "Most common driver actions in bike/ped crashes",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_filename, "DriverAction.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(crash_time = ymd_hm(paste0("2026-01-01", str_pad(CRSHTIME, width = 4, side = "left", pad = "0")))) |> 
+  ggplot() +
+  geom_violin(
+    aes(
+      x = CNTYNAME,
+      y = crash_time,
+      fill = CNTYNAME
+    )
+  ) +
+  scale_fill_manual(values=unname(glasbey()), guide = NULL) +
+  facet_grid(vulnerable_role ~ .) +
+  scale_y_datetime(date_labels = "%H:%M") +
+  caption_theme +
+  labs(y = "Time of Day",
+       x = "County",
+       title = "Time of day in bike/ped crashes with injuries",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_filename, "TimeOfDay.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  group_by(CNTYNAME) |> 
+  summarise(total_crashes = n()) |> 
+  left_join(county_populations, join_by(CNTYNAME == County)) |> 
+  ggplot() +
+  geom_point(
+    aes(x = value,
+        y = total_crashes,
+        size = value,
+        color = CNTYNAME)
+  ) +
+  scale_color_manual(values=unname(glasbey())) +
+  caption_theme +
+  labs(y = "Number of total crashes",
+       x = "Population of county",
+       title = "Crashes involving injuries to pedestrians/bicyclists",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_filename, "CrashPopulation.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  group_by(CNTYNAME) |> 
+  summarise(total_crashes = n()) |> 
+  left_join(county_populations, join_by(CNTYNAME == County)) |> 
+  mutate(crashesper100k = ((total_crashes / (max(year(TOPS_data$date)) - min(year(TOPS_data$date)) + 1)) / value) * 100000) |> 
+  ggplot() +
+  geom_col(
+    aes(x = CNTYNAME,
+        y = crashesper100k,
+        fill = CNTYNAME)
+  ) +
+  scale_fill_manual(values=unname(glasbey()), guide = NULL) +
+  caption_theme +
+  labs(y = "Crashes per 100,000 people per year",
+       x = "County",
+       title = "Crashes involving injuries to pedestrians/bicyclists",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_filename, "CrashPopulationProportional.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  filter(vulnerable_age <= 18) |> 
+  group_by(CNTYNAME) |> 
+  summarise(total_crashes = n()) |> 
+  left_join(county_populations, join_by(CNTYNAME == County)) |> 
+  mutate(crashesper100k = ((total_crashes / (max(year(TOPS_data$date)) - min(year(TOPS_data$date)) + 1)) / value) * 100000) |> 
+  ggplot() +
+  geom_col(
+    aes(x = CNTYNAME,
+        y = crashesper100k,
+        fill = CNTYNAME)
+  ) +
+  scale_fill_manual(values=unname(glasbey()), guide = NULL) +
+  caption_theme +
+  labs(y = "Crashes per 100,000 people per year",
+       x = "County",
+       title = "Crashes involving injuries to youth pedestrians/bicyclists",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_filename, "YouthCrashPopulationProportional.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(year = year(date)) |> 
+  group_by(CNTYNAME, year) |> 
+  summarise(total_crashes = n()) |> 
+  left_join(county_populations, join_by(CNTYNAME == County)) |> 
+  mutate(crashesper100k = (total_crashes / value) * 100000) |> 
+  ungroup() |> 
+  ggplot() +
+  geom_line(
+    aes(x = year.x,
+        y = crashesper100k,
+        color = CNTYNAME)
+  ) +
+  scale_color_manual(values=unname(glasbey())) +
+  caption_theme +
+  labs(y = "Crashes per 100,000 people",
+       x = "County",
+       title = "Crashes involving injuries pedestrians/bicyclists",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_filename, "CrashesbyYear.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
 
 ```
