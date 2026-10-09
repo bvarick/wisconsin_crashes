@@ -25,6 +25,7 @@ library(leaflet)
 library(pals)
 library(tidycensus)
 library(sf)
+library(scales)
 
 ```
 
@@ -884,6 +885,419 @@ TOPS_data |>
   ) +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 ggsave(file = paste0(county_compare_filename, "CrashesbyYear.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+##  County comparisons - ped
+county_compare_ped_filename <- paste0("figures/crash_summaries/state/county_compare_ped/")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(vulnerable_role == "Pedestrian") |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  ggplot() +
+  geom_violin(
+    aes(y = vulnerable_age,
+        x = CNTYNAME,
+        fill = CNTYNAME
+    )
+  ) +
+  scale_fill_manual(values=unname(glasbey()), guide = NULL) +
+  caption_theme +
+  labs(x = "County",
+       y = "Age of Pedestrian",
+       title = "Age of Pedestrian - all injuries",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  )
+ggsave(file = paste0(county_compare_ped_filename, "VulnAge_InjSev.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(vulnerable_role == "Pedestrian") |> 
+  filter(ped_inj %in% c("A", "K")) |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  ggplot() +
+  geom_violin(
+    aes(y = vulnerable_age,
+        x = CNTYNAME,
+        fill = CNTYNAME
+    )
+  ) +
+  scale_fill_manual(values=unname(glasbey()), guide = NULL) +
+  caption_theme +
+  labs(x = "County",
+       y = "Age of Pedestrian",
+       title = "Age of Pedestrian - severe injuries and fatalities",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  )
+ggsave(file = paste0(county_compare_ped_filename, "VulnAge_InjSev_AK.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+driver_actions <- c("BACKING",
+                    "GO STR",
+                    "LT TRN",
+                    "RT TRN",
+                    "UNKN",
+                    NA)
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(vulnerable_role == "Pedestrian") |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(driver_action = ifelse(ROLE1 %in% vuln_roles, DRVRDOIN2, ifelse(ROLE2 %in% vuln_roles, DRVRDOIN1, NA))) |>
+  filter(driver_action %in% driver_actions) |> 
+  group_by(driver_action,vulnerable_role, CNTYNAME) |> 
+  summarise(count = n(), .groups = "drop") |> 
+  group_by(CNTYNAME) |> 
+  mutate(pct = (count / sum(count)) * 100) |> 
+  ggplot() +
+  geom_col(aes(
+    x = driver_action,
+    y = pct,
+    fill = CNTYNAME
+  ),
+  position = position_dodge()) +
+  scale_fill_manual(values=unname(glasbey())) +
+  caption_theme +
+  labs(x = "Driver Action",
+       y = "Percent of county's crashes",
+       fill = "County",
+       title = "Most common driver actions in ped crashes",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_ped_filename, "DriverAction.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(vulnerable_role == "Pedestrian") |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(crash_time = ymd_hm(paste0("2026-01-01", str_pad(CRSHTIME, width = 4, side = "left", pad = "0")))) |> 
+  ggplot() +
+  geom_violin(
+    aes(
+      x = CNTYNAME,
+      y = crash_time,
+      fill = CNTYNAME
+    )
+  ) +
+  scale_fill_manual(values=unname(glasbey()), guide = NULL) +
+  scale_y_datetime(date_labels = "%H:%M") +
+  caption_theme +
+  labs(y = "Time of Day",
+       x = "County",
+       title = "Time of day in ped crashes with injuries",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_ped_filename, "TimeOfDay.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(vulnerable_role == "Pedestrian") |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  group_by(CNTYNAME) |> 
+  summarise(total_crashes = n()) |> 
+  left_join(county_populations, join_by(CNTYNAME == County)) |> 
+  ggplot() +
+  geom_point(
+    aes(x = value,
+        y = total_crashes,
+        size = value,
+        color = CNTYNAME)
+  ) +
+  scale_color_manual(values=unname(glasbey())) +
+  caption_theme +
+  labs(y = "Number of total crashes",
+       x = "Population of county",
+       title = "Crashes involving injuries to pedestrians",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_ped_filename, "CrashPopulation.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(vulnerable_role == "Pedestrian") |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  group_by(CNTYNAME) |> 
+  summarise(total_crashes = n()) |> 
+  left_join(county_populations, join_by(CNTYNAME == County)) |> 
+  mutate(crashesper100k = ((total_crashes / (max(year(TOPS_data$date)) - min(year(TOPS_data$date)) + 1)) / value) * 100000) |> 
+  ggplot() +
+  geom_col(
+    aes(x = CNTYNAME,
+        y = crashesper100k,
+        fill = CNTYNAME)
+  ) +
+  scale_fill_manual(values=unname(glasbey()), guide = NULL) +
+  caption_theme +
+  labs(y = "Crashes per 100,000 people per year",
+       x = "County",
+       title = "Crashes involving injuries to pedestrians",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_ped_filename, "CrashPopulationProportional.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(vulnerable_role == "Pedestrian") |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  filter(vulnerable_age <= 18) |> 
+  group_by(CNTYNAME) |> 
+  summarise(total_crashes = n()) |> 
+  left_join(county_populations, join_by(CNTYNAME == County)) |> 
+  mutate(crashesper100k = ((total_crashes / (max(year(TOPS_data$date)) - min(year(TOPS_data$date)) + 1)) / value) * 100000) |> 
+  ggplot() +
+  geom_col(
+    aes(x = CNTYNAME,
+        y = crashesper100k,
+        fill = CNTYNAME)
+  ) +
+  scale_fill_manual(values=unname(glasbey()), guide = NULL) +
+  caption_theme +
+  labs(y = "Crashes per 100,000 people per year",
+       x = "County",
+       title = "Crashes involving injuries to youth pedestrians",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_ped_filename, "YouthCrashPopulationProportional.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  filter(CNTYNAME %in% county_focus_top) |> 
+  filter(vulnerable_role == "Pedestrian") |> 
+  filter(ped_inj %in% injury_severy_focus) |> 
+  mutate(year = year(date)) |> 
+  group_by(CNTYNAME, year) |> 
+  summarise(total_crashes = n()) |> 
+  left_join(county_populations, join_by(CNTYNAME == County)) |> 
+  mutate(crashesper100k = (total_crashes / value) * 100000) |> 
+  ungroup() |> 
+  ggplot() +
+  geom_line(
+    aes(x = year.x,
+        y = crashesper100k,
+        color = CNTYNAME)
+  ) +
+  scale_color_manual(values=unname(glasbey())) +
+  caption_theme +
+  labs(y = "Crashes per 100,000 people",
+       x = "County",
+       title = "Crashes involving injuries pedestrians",
+       subtitle = top15_subtitle,
+       caption = caption_text
+  ) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+ggsave(file = paste0(county_compare_ped_filename, "CrashesbyYear.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+
+```
+
+
+## Make figures for older adults
+```{r seniorfigures, eval = TRUE, echo = TRUE, results = "show", warning = FALSE, error = TRUE, message = FALSE}
+
+senior_filename <- "figures/crash_summaries/seniors/"
+all_subtitle <- paste0("Crashes in Wisconsin - 2017-", year(max(TOPS_data$date)))
+
+TOPS_data |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  filter(vulnerable_age >= 60) |> 
+  group_by(ped_inj_name, year) |> 
+  summarise(count = n()) |> 
+  ggplot() +
+  geom_line(
+    aes(x = year,
+        y = count,
+        color = ped_inj_name,
+        group = ped_inj_name),
+    size = 2
+  ) +
+  scale_y_continuous(minor_breaks = seq(0,225,10), limits = c(0, NA)) +
+  scale_color_viridis_d(direction = -1, option = "D") +
+  coord_cartesian(expand = c(TRUE, TRUE, FALSE, TRUE)) +
+  caption_theme +
+  labs(title = "Crashes involving older (60+) adults walking & biking",
+       x = "Year",
+       y = "Number of crashes",
+       color = "Severity of crash",
+       subtitle = all_subtitle,
+       caption = caption_text
+  )
+ggsave(file = paste0(senior_filename, "Senior_InjSev.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  filter(vulnerable_age >= 60) |> 
+  group_by(year) |> 
+  summarise(count = n()) |> 
+  mutate(ped_inj = "All") |> 
+  ggplot() +
+  geom_line(
+    aes(x = year,
+        y = count,
+        group = ped_inj)
+  ) +
+  geom_label(
+    aes(
+      x = year,
+      y = count,
+      label = count
+    ),
+    size = 6
+  ) +
+  coord_cartesian(ylim = c(0, NA), expand = c(TRUE, TRUE, FALSE, TRUE)) +
+  caption_theme +
+  labs(title = "Crashes involving older (60+) adults walking & biking",
+       x = "Year",
+       y = "Number of crashes",
+       subtitle = all_subtitle,
+       caption = caption_text
+  )
+ggsave(file = paste0(senior_filename, "Senior_All.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  filter(vulnerable_age >= 60) |> 
+  group_by(year) |> 
+  summarise(count = n()) |> 
+  mutate(ped_inj = "All") |> 
+  ggplot() +
+  geom_line(
+    aes(x = year,
+        y = count,
+        group = ped_inj)
+  ) +
+  geom_label(
+    aes(
+      x = year,
+      y = count,
+      label = count
+    ),
+    size = 6
+  ) +
+  coord_cartesian(ylim = c(300, NA), expand = c(TRUE, TRUE, FALSE, TRUE)) +
+  caption_theme +
+  labs(title = "Crashes involving older (60+) adults walking & biking",
+       x = "Year",
+       y = "Number of crashes",
+       subtitle = all_subtitle,
+       caption = caption_text
+  )
+ggsave(file = paste0(senior_filename, "Senior_All_truncated.pdf"),
+       height = 8.5,
+       width = 11,
+       units = "in")
+
+TOPS_data |> 
+  mutate(vulnerable_age = ifelse(ROLE1 %in% vuln_roles, age1, ifelse(ROLE2 %in% vuln_roles, age2, NA))) |>
+  filter(vulnerable_age >= 60) |> 
+  group_by(ped_inj_name, year) |> 
+  summarise(count = n()) |> 
+  pivot_wider(
+    names_from = ped_inj_name,
+    values_from = count
+  ) |> 
+  write_csv(file = paste0(senior_filename, "Senior_InjSev.csv"))
+
+# 1. Base data
+vulnerable_crashes <- TOPS_data |> 
+  mutate(
+    vulnerable_age = case_when(
+      ROLE1 %in% vuln_roles ~ age1,
+      ROLE2 %in% vuln_roles ~ age2,
+      .default = NA
+    )
+  ) |> 
+  filter(!is.na(vulnerable_age)) |> 
+  mutate(
+    senior = case_when(
+      vulnerable_age >= 60 ~ "60 and older",
+      vulnerable_age < 60  ~ "Under 60"
+    )
+  )
+
+# 2. Add panel variable and facet
+bind_rows(
+  mutate(vulnerable_crashes, panel = "By Severity"),
+  mutate(vulnerable_crashes, ped_inj_name = "All Injury Severities", panel = "Total")
+) |> 
+  mutate(
+    ped_inj_name = factor(
+      ped_inj_name,
+      levels = c(levels(vulnerable_crashes$ped_inj_name), "All Injury Severities")
+    ),
+    panel = factor(panel, levels = c("By Severity", "Total"))
+  ) |> 
+  group_by(panel, ped_inj_name, senior) |> 
+  summarise(count = n(), .groups = "drop") |> 
+  group_by(ped_inj_name) |> 
+  mutate(pct = count / sum(count)) |> 
+  ggplot(
+    aes(x = ped_inj_name, 
+        y = count, 
+        fill = senior)) +
+  geom_col(position = "fill") +
+  geom_label(
+    aes(label = scales::percent(pct, accuracy = 1)),
+    position = position_fill(vjust = 0.5),
+    show.legend = FALSE
+  ) +
+  scale_y_continuous(labels = scales::label_percent()) +
+  coord_cartesian(expand = c(FALSE, TRUE, FALSE, TRUE)) +
+  facet_grid(~ panel, scales = "free_x", space = "free_x") +
+  caption_theme +
+  labs(
+    title = "Crashes involving people walking & biking",
+    x = "Injury Severity",
+    y = "Percentage of crashes",
+    fill = "Age of vulnerable\nroad user",
+    subtitle = all_subtitle,
+    caption = caption_text
+  )
+
+ggsave(file = paste0(senior_filename, "Senior_InjSev_percent.pdf"),
        height = 8.5,
        width = 11,
        units = "in")
